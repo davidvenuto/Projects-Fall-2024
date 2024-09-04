@@ -25,8 +25,8 @@ The business context for this project is to provide a tool that simplifies the p
   - [ ] Allow users to create unique accounts for website and save their files using SQL Database.
   - [x] Let users save their graphs as XML code as opposed to image (using python)
   - [ ] Let users save their graphs as TIKZ/Latex code (using python)
-[] Write up first features to implement and how they will be implemented
- - [] Webpage with drag and drop graphs
- - [] Give users the ability to save their graphs as files
+[ ] Write up first features to implement and how they will be implemented
+ - [ ] Webpage with drag and drop graphs
+ - [ ] Give users the ability to save their graphs as files
 
    ![Projects Picture](https://github.com/user-attachments/assets/ccc29a96-9f2a-4e6e-8868-982152124248)
