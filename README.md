@@ -18,7 +18,7 @@ The business context for this project is to provide a tool that simplifies the p
 #Roadmap and Weekly Progress
 
 ## Week 1
-[] Draw out basic design for website including ALL desired features (tentative outline)
+[ ] Draw out basic design for website including ALL desired features (tentative outline)
   - [] Webpage with drag and drop graphs using HTML/CSS/Javascript/Typescript
   - [] Give users the ability to save their graphs as files (Unsure of what library will be used for this yet).
   - [] Allow users to login to website using Google API
