@@ -15,8 +15,8 @@ image to LaTex.
 # Business Context
 The business context for this project is to provide a tool that simplifies the process of creating finite automata graphs for students and teachers. This web application will address the need for an interactive, user-friendly platform where users can design and customize graphs through a drag-and-drop interface. By enabling the generation of XML and LaTeX code directly from the created graphs, the application will streamline the workflow for users who need to incorporate these graphs in academic settings, reducing the time required for such tasks. The tool will be designed to enhance the educational experience by making graph creation more accessible and efficient.
 
-# Roadmap and Weekly Progress
-  - [ ] Draw out basic design for website including ALL desired features (tentative outline)
+# Roadmap
+  - [x] Draw out basic design for website including ALL desired features (tentative outline)
   - [ ] Webpage with drag and drop graphs using HTML/CSS/Javascript/Typescript
   - [ ] Give users the ability to save their graphs as files (Unsure of what library will be used for this yet).
   - [ ] Allow users to login to website using Google API
