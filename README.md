@@ -19,12 +19,12 @@ The business context for this project is to provide a tool that simplifies the p
 
 ## Week 1
 [ ] Draw out basic design for website including ALL desired features (tentative outline)
-  - [] Webpage with drag and drop graphs using HTML/CSS/Javascript/Typescript
-  - [] Give users the ability to save their graphs as files (Unsure of what library will be used for this yet).
-  - [] Allow users to login to website using Google API
-  - [] Allow users to create unique accounts for website and save their files using SQL Database.
-  - [] Let users save their graphs as XML code as opposed to image (using python)
-  - [] Let users save their graphs as TIKZ/Latex code (using python)
+  - [ ] Webpage with drag and drop graphs using HTML/CSS/Javascript/Typescript
+  - [ ] Give users the ability to save their graphs as files (Unsure of what library will be used for this yet).
+  - [ ] Allow users to login to website using Google API
+  - [ ] Allow users to create unique accounts for website and save their files using SQL Database.
+  - [x] Let users save their graphs as XML code as opposed to image (using python)
+  - [ ] Let users save their graphs as TIKZ/Latex code (using python)
 [] Write up first features to implement and how they will be implemented
  - [] Webpage with drag and drop graphs
  - [] Give users the ability to save their graphs as files
