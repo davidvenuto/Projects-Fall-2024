@@ -1,7 +1,15 @@
 <template>
-    <div>
-      <h1>Home Page</h1>
-      <p>Welcome to the home page!</p>
+    <div class="container">
+      <div class="workspace">
+        <h2>Workspace</h2>
+        <p>Drop items here</p>
+        <!-- Workspace where users will drop items -->
+      </div>
+      <div class="toolbox">
+        <h2>Toolbox</h2>
+        <p>Drag items from here</p>
+        <!-- Add toolbox items here -->
+      </div>
     </div>
   </template>
   
@@ -12,8 +20,26 @@
   </script>
   
   <style scoped>
-  h1 {
-    color: #42b983;
+  /* Container for both the toolbox and workspace */
+  .container {
+    display: flex;
+    height: 100vh; /* Full viewport height */
+  }
+  
+  /* Toolbox styling */
+  .toolbox {
+    width: 20%; /* 20% of the width for toolbox */
+    background-color: #f0f0f0;
+    padding: 20px;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Workspace styling */
+  .workspace {
+    width: 80%; /* 80% of the width for workspace */
+    background-color: #ffffff;
+    padding: 20px;
+    border-left: 1px solid #ccc;
   }
   </style>
   

@@ -27,7 +27,14 @@ The business context for this project is to provide a tool that simplifies the p
 # Week 1
   - [x] Draw out basic design for website including ALL desired features (tentative outline)
   - [x] Outline business context
-  - [ ] Write up weekly update #1
+  - [x] Write up weekly update #1
 
+# Week 2
+- [x] Create a basic front end complete with routes to each page (Using Vue)
+- [x] Mount front end onto router and set up localhost (Using Vite and Express)
+- [ ] Add all desired components for each page
+- [ ] Format the pages with CSS
+
+# Week 3
 
    ![Projects Picture](https://github.com/user-attachments/assets/ccc29a96-9f2a-4e6e-8868-982152124248)
