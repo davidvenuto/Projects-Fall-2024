@@ -5,7 +5,7 @@ export default defineConfig({
   plugins: [vue()],
   resolve: {
     alias: {
-      '@': '/src', // This will allow path aliasing with '@/'
+      '@': '/src',
     },
   },
 });
