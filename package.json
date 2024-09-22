@@ -11,7 +11,7 @@
     },
     "dependencies": {
         "dayjs": "1.11.10",
-        "express": "4.19.2",
+        "express": "^4.21.0",
         "projects-fall-2024": "file:",
         "typescript": "^5.3.3"
     },
