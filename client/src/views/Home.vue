@@ -1,17 +1,39 @@
 <template>
   <div class="container">
-    <div class="workspace" ref="workspace" @dragover.prevent="onDragOver" @drop="onDrop">
-      <h2 class="workspace-title">Workspace</h2>
-      <p>Drop items here</p>
-      <div v-for="(item, index) in droppedItems" :key="index" :style="{
-      position: 'absolute',
-      left: item.x + 'px',
-      top: item.y + 'px'
-    }" class="workspace-item" draggable="true" @dragstart="onItemDragStart($event, index)">
-        {{ item.type }}
+    <!-- Left Side (Workspace Header and Workspace) -->
+    <div class="left-side">
+      <!-- Workspace Header and Controls -->
+      <div class="workspace-header">
+        <h2 class="workspace-title">Workspace</h2>
+        <p>Drop items here</p>
+        <button @click="saveAsImage">Save Workspace as Image</button>
       </div>
-      <button @click="saveAsImage">Save Workspace as Image</button>
+
+      <!-- Workspace Area -->
+      <div 
+        class="workspace" 
+        ref="workspace" 
+        @dragover.prevent="onDragOver" 
+        @drop="onDrop"
+      >
+        <div 
+          v-for="(item, index) in droppedItems" 
+          :key="index" 
+          :style="{
+            position: 'absolute',
+            left: item.x + 'px',
+            top: item.y + 'px'
+          }" 
+          class="workspace-item" 
+          draggable="true" 
+          @dragstart="onItemDragStart($event, index)"
+        >
+          {{ item.type }}
+        </div>
+      </div>
     </div>
+
+    <!-- Toolbox -->
     <div class="toolbox">
       <h2>Toolbox</h2>
       <p>Drag items from here:</p>
@@ -34,6 +56,8 @@
     </div>
   </div>
 </template>
+
+
 
 
 <script lang="ts">
@@ -114,21 +138,42 @@ export default {
 
 
 <style scoped>
+/* Reset default margins and padding */
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+/* Container holding the left side and toolbox */
 .container {
   display: flex;
+  /* Remove margin-top and adjust height */
   height: 100vh;
 }
 
+/* Left side containing the workspace header and workspace area */
+.left-side {
+  display: flex;
+  flex-direction: column;
+  width: 80%; /* Adjust as needed */
+}
+
+/* Workspace header styling */
+.workspace-header {
+  padding: 20px; /* Uniform padding */
+  background-color: #ffffff;
+  border-bottom: 1px solid #ddd;
+}
+
+/* Workspace area styling */
 .workspace {
-  width: 80%;
+  flex: 1; /* Allows the workspace to fill the remaining vertical space */
   background-color: #ffffff;
   border: 1px solid #ddd;
-  /* Add this line */
-  padding: 20px;
   position: relative;
 }
 
-
+/* Workspace item styling */
 .workspace-item {
   padding: 10px;
   background-color: #42b983;
@@ -139,12 +184,14 @@ export default {
   cursor: grab;
 }
 
+/* Toolbox styling */
 .toolbox {
-  width: 20%;
+  width: 20%; /* Adjust to match the left-side width */
   background-color: #f0f0f0;
   padding: 20px;
 }
 
+/* Toolbox item styling */
 .toolbox-item {
   padding: 10px;
   margin-bottom: 10px;
@@ -154,3 +201,6 @@ export default {
   cursor: grab;
 }
 </style>
+
+
+
