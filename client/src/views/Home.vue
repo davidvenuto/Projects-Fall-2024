@@ -1,15 +1,12 @@
 <template>
   <div class="container">
-    <!-- Left Side (Workspace Header and Workspace) -->
     <div class="left-side">
-      <!-- Workspace Header and Controls -->
       <div class="workspace-header">
         <h2 class="workspace-title">Workspace</h2>
         <p>Drop items here</p>
         <button @click="saveAsImage">Save Workspace as Image</button>
       </div>
 
-      <!-- Workspace Area -->
       <div 
         class="workspace" 
         ref="workspace" 
@@ -33,7 +30,6 @@
       </div>
     </div>
 
-    <!-- Toolbox -->
     <div class="toolbox">
       <h2>Toolbox</h2>
       <p>Drag items from here:</p>
@@ -138,42 +134,35 @@ export default {
 
 
 <style scoped>
-/* Reset default margins and padding */
 html, body {
   margin: 0;
   padding: 0;
 }
 
-/* Container holding the left side and toolbox */
 .container {
   display: flex;
-  /* Remove margin-top and adjust height */
   height: 100vh;
 }
 
-/* Left side containing the workspace header and workspace area */
 .left-side {
   display: flex;
   flex-direction: column;
-  width: 80%; /* Adjust as needed */
+  width: 80%; 
 }
 
-/* Workspace header styling */
 .workspace-header {
-  padding: 20px; /* Uniform padding */
+  padding: 20px; 
   background-color: #ffffff;
   border-bottom: 1px solid #ddd;
 }
 
-/* Workspace area styling */
 .workspace {
-  flex: 1; /* Allows the workspace to fill the remaining vertical space */
+  flex: 1; 
   background-color: #ffffff;
   border: 1px solid #ddd;
   position: relative;
 }
 
-/* Workspace item styling */
 .workspace-item {
   padding: 10px;
   background-color: #42b983;
@@ -184,14 +173,12 @@ html, body {
   cursor: grab;
 }
 
-/* Toolbox styling */
 .toolbox {
-  width: 20%; /* Adjust to match the left-side width */
+  width: 20%; 
   background-color: #f0f0f0;
   padding: 20px;
 }
 
-/* Toolbox item styling */
 .toolbox-item {
   padding: 10px;
   margin-bottom: 10px;
