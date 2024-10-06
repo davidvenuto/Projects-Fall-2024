@@ -12,6 +12,7 @@
     "dependencies": {
         "dayjs": "1.11.10",
         "express": "^4.21.0",
+        "html2canvas": "^1.4.1",
         "projects-fall-2024": "file:",
         "typescript": "^5.3.3"
     },

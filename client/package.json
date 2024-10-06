@@ -21,7 +21,8 @@
         "html2canvas": "^1.4.1",
         "pinia": "^2.1.7",
         "vue": "^3.5.3",
-        "vue-router": "^4.4.3"
+        "vue-router": "^4.4.3",
+        "vue3-google-login": "^2.0.33"
     },
     "devDependencies": {
         "@tsconfig/node20": "^20.1.2",
