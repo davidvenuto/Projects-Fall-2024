@@ -5,9 +5,9 @@
     "author": "David Venuto",
     "license": "ISC",
     "scripts": {
-        "start": "node dist/index.js",
-        "dev": "nodemon --watch 'server/**/*.ts' --exec 'ts-node' server/index.ts",
-        "build": "tsc"
+        "build": "npm i --production && cd client && npm i && npm run build",
+        "start": "node server/index.js",
+        "dev": "nodemon server/index.js --watch server/"
     },
     "dependencies": {
         "dayjs": "1.11.10",
