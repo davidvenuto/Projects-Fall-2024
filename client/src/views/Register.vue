@@ -1,8 +1,9 @@
 <template>
   <div>
     <form @submit.prevent="register">
-      <input v-model="user.name" placeholder="Name" required />
+      <input v-model="user.fullname" placeholder="Full Name" required />
       <input v-model="user.email" placeholder="Email" required />
+      <input v-model="user.username" placeholder="Username" required />
       <input v-model="user.password" type="password" placeholder="Password" required />
       <button type="submit">Register</button>
     </form>
@@ -15,9 +16,11 @@ export default {
   data() {
     return {
       user: {
-        name: '',
+        fullname: '',
         email: '',
-        password: ''
+        username: '',
+        password: '',
+        isAdmin: false
       }
     };
   },
@@ -31,6 +34,9 @@ export default {
           },
           body: JSON.stringify(this.user)
         });
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
         const data = await response.json();
         console.log('User registered:', data);
       } catch (error) {
@@ -40,7 +46,6 @@ export default {
   }
 };
 </script>
-
 <style scoped>
 h1 {
   color: #42b983;

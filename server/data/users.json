@@ -33,9 +33,11 @@
       "isAdmin": true
     },
     {
-      "name": "hi",
-      "email": "bob@gmail.com",
-      "password": "asdsadada",
+      "fullname": "Bob Allen",
+      "email": "hello@gmail.com",
+      "username": "bobtheallen",
+      "password": "abc123",
+      "isAdmin": false,
       "userid": 4
     }
   ]
