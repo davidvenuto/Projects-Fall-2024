@@ -4,6 +4,10 @@
     <p>Welcome to the Register page!</p>
     <form @submit.prevent="register">
       <div>
+        <label for="fullname">Full Name:</label>
+        <input type="text" id="fullname" v-model="form.fullname" required />
+      </div>
+      <div>
         <label for="username">Username:</label>
         <input type="text" id="username" v-model="form.username" required />
       </div>
@@ -17,6 +21,8 @@
       </div>
       <button type="submit">Register</button>
     </form>
+    <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
+    <p v-if="successMessage" class="success">{{ successMessage }}</p>
   </div>
 </template>
 
@@ -27,19 +33,68 @@ export default defineComponent({
   name: 'Register',
   setup() {
     const form = ref({
+      fullname: '',
       username: '',
       email: '',
       password: ''
     });
 
-    const register = () => {
-      // Add your registration logic here
-      console.log('Form submitted:', form.value);
-    };
+    const errorMessage = ref('');
+    const successMessage = ref('');
+
+    const register = async () => {
+  errorMessage.value = '';
+  successMessage.value = '';
+
+  try {
+    const response = await fetch('/api/users', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        fullname: form.value.fullname,
+        username: form.value.username,
+        email: form.value.email,
+        password: form.value.password,
+        isAdmin: false // Set isAdmin to false by default
+      })
+    });
+
+    const textResponse = await response.text(); // Read response as text
+    console.log('Raw response:', textResponse);
+
+    if (!response.ok) {
+      // Try to parse error message if possible
+      let errorData;
+      try {
+        errorData = JSON.parse(textResponse);
+      } catch (e) {
+        throw new Error('Registration failed with status ' + response.status);
+      }
+      throw new Error(errorData.message || 'Registration failed');
+    }
+
+    const data = JSON.parse(textResponse); // Parse the text as JSON
+    successMessage.value = 'Registration successful!';
+    console.log('User registered:', data);
+    // Reset the form fields
+    form.value.fullname = '';
+    form.value.username = '';
+    form.value.email = '';
+    form.value.password = '';
+  } catch (error: any) {
+    errorMessage.value = error.message;
+    console.error('Error:', error);
+  }
+};
+
 
     return {
       form,
-      register
+      register,
+      errorMessage,
+      successMessage
     };
   }
 });
@@ -76,5 +131,13 @@ button {
 }
 button:hover {
   background-color: #369f75;
+}
+.error {
+  color: red;
+  text-align: center;
+}
+.success {
+  color: green;
+  text-align: center;
 }
 </style>
