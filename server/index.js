@@ -1,12 +1,17 @@
 const express = require('express');
 const path = require('path');
+const cors = require('cors');
 const app = express();
 const port = 3000;
 
-// Serve static files from the client/dist directory
+app.use(cors());
+app.use(express.json());
 app.use(express.static(path.join(__dirname, '../client/dist')));
 
-// Catch-all route to serve index.html for any other routes
+// Import and use the users controller
+const usersController = require('./controllers/users');
+app.use('/api/users', usersController);
+
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/dist/index.html'));
 });
