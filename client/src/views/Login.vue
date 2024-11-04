@@ -13,6 +13,15 @@
       </div>
       <button type="submit">Login</button>
     </form>
+    <div v-if="error" class="error">{{ error }}</div>
+
+    <div v-if="showModal" class="modal-overlay" @click="closeModal">
+      <div class="modal-content" @click.stop>
+        <h2>Login Successful</h2>
+        <p>You have been logged in successfully!</p>
+        <button @click="closeModal">Close</button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -24,17 +33,43 @@ export default defineComponent({
   setup() {
     const email = ref('');
     const password = ref('');
+    const error = ref('');
+    const showModal = ref(false);
 
-    const handleLogin = () => {
-      // Handle login logic here
-      console.log('Email:', email.value);
-      console.log('Password:', password.value);
+    const handleLogin = async () => {
+      try {
+        const response = await fetch('/api/users/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ email: email.value, password: password.value })
+        });
+        if (!response.ok) {
+          throw new Error('Invalid email or password');
+        }
+        const data = await response.json();
+        console.log('User logged in:', data.user);
+        error.value = '';
+        showModal.value = true;
+        // Handle successful login (e.g., store user info, redirect)
+      } catch (err: any) {
+        error.value = err.message;
+      }
+    };
+
+    const closeModal = () => {
+      showModal.value = false;
+      // Optionally, redirect to another page
     };
 
     return {
       email,
       password,
       handleLogin,
+      error,
+      showModal,
+      closeModal
     };
   },
 });
@@ -79,5 +114,40 @@ button {
 
 button:hover {
   background-color: #369f6b;
+}
+
+.error {
+  color: red;
+}
+
+.success {
+  color: green;
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 5px;
+}
+
+.modal-content h2 {
+  margin-top: 0;
+}
+
+.modal-content button {
+  margin-top: 15px;
 }
 </style>

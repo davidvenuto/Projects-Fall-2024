@@ -39,6 +39,22 @@
       "password": "abc123",
       "isAdmin": false,
       "userid": 4
+    },
+    {
+      "fullname": "New Account",
+      "email": "hello@gmail.com",
+      "username": "NewPerson",
+      "password": "newpassword",
+      "isAdmin": false,
+      "userid": 5
+    },
+    {
+      "fullname": "onion",
+      "email": "onion@hawktuah.com",
+      "username": "lol",
+      "password": "lol",
+      "isAdmin": false,
+      "userid": 6
     }
   ]
 }

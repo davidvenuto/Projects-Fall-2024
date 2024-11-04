@@ -1,4 +1,4 @@
-const users = require('../models/users')
+const users = require('../models/users');
 const express = require('express');
 const app = express.Router();
 
@@ -27,6 +27,19 @@ app
         }).catch(next);
     })
 
+    .post('/login', (req, res, next) => {
+        const { email, password } = req.body;
+        users.getAll()
+        .then(all => {
+            const user = all.find(u => u.email === email && u.password === password);
+            if (user) {
+                res.json({ success: true, user: { ...user, password: undefined } });
+            } else {
+                res.status(401).json({ success: false, message: 'Invalid email or password' });
+            }
+        }).catch(next);
+    })
+
     .patch('/:id', (req, res, next) => {
         const user = req.body;
         user.id = req.params.id;
@@ -52,4 +65,4 @@ app
         }).catch(next);
     })
 
-module.exports = app
+module.exports = app;
