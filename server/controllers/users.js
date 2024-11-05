@@ -29,16 +29,19 @@ app
 
     .post('/login', (req, res, next) => {
         const { email, password } = req.body;
+        if (!email || !password) {
+          return res.status(400).json({ success: false, message: 'Email and password are required' });
+        }
         users.getAll()
-        .then(all => {
+          .then(all => {
             const user = all.find(u => u.email === email && u.password === password);
             if (user) {
-                res.json({ success: true, user: { ...user, password: undefined } });
+              res.json({ success: true, user: { ...user, password: undefined } }); // Remove password before sending
             } else {
-                res.status(401).json({ success: false, message: 'Invalid email or password' });
+              res.status(401).json({ success: false, message: 'Invalid email or password' });
             }
-        }).catch(next);
-    })
+          }).catch(next);
+      })
 
     .patch('/:id', (req, res, next) => {
         const user = req.body;

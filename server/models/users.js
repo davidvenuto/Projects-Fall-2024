@@ -14,10 +14,8 @@ async function save() {
 
 async function getAll() {
     const data = await dataP;
-    return data.items.map(x => ({
-        ...x, password: undefined,
-    }))
-}
+    return data.items; // Return all user data, including passwords
+  }  
 
 async function get(userid) {
     const data = await dataP;
