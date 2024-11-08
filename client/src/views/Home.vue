@@ -10,9 +10,10 @@
       <div class="workspace" ref="workspace" @dragover.prevent="onDragOver" @drop="onDrop">
         <svg class="edges-layer" style="position: absolute; width: 100%; height: 100%; top: 0; left: 0;">
           <defs>
-            <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+            <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="20" refY="3.5" orient="auto">
               <polygon points="0 0, 10 3.5, 0 7" fill="black" />
             </marker>
+
           </defs>
           <path v-for="edge in edges" :key="edge.id" :d="'M' + edge.x1 + ',' + edge.y1 + ' L' + edge.x2 + ',' + edge.y2"
             stroke="black" stroke-width="2" fill="none" marker-end="url(#arrowhead)" />
@@ -45,9 +46,17 @@
       </div>
 
       <div class="toolbox-item" draggable="true" @dragstart="onDragStart($event, 'Edge')">
-        <div class="edge-line"></div>
-        <p>Edge</p>
-      </div>
+  <svg width="60" height="10">
+    <defs>
+      <marker id="toolbox-arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+        <polygon points="0 0, 10 3.5, 0 7" fill="black" />
+      </marker>
+    </defs>
+    <line x1="0" y1="5" x2="50" y2="5" stroke="black" stroke-width="2" marker-end="url(#toolbox-arrowhead)" />
+  </svg>
+  <p>Edge</p>
+</div>
+
     </div>
   </div>
 </template>
@@ -101,61 +110,64 @@ export default {
     },
 
     onDrop(event: DragEvent) {
-  event.preventDefault();
-  const dataTransfer = event.dataTransfer;
-  if (!dataTransfer) return;
+      event.preventDefault();
+      const dataTransfer = event.dataTransfer;
+      if (!dataTransfer) return;
 
-  const workspaceRect = (event.currentTarget as HTMLElement).getBoundingClientRect();
-  const x = event.clientX - workspaceRect.left;
-  const y = event.clientY - workspaceRect.top;
+      const workspaceRect = (event.currentTarget as HTMLElement).getBoundingClientRect();
+      const x = event.clientX - workspaceRect.left;
+      const y = event.clientY - workspaceRect.top;
 
-  const movingItemIndex = dataTransfer.getData('movingItemIndex');
-  if (movingItemIndex !== '') {
-    const index = parseInt(movingItemIndex);
-    if (!isNaN(index) && this.nodes[index]) {
-      this.nodes[index].x = x;
-      this.nodes[index].y = y;
-      this.updateEdges();
-    }
-  } else {
-    const itemType = dataTransfer.getData('type');
-    if (itemType === 'InitialNode' && !this.hasInitialState) {
-      this.nodes.push({ id: uuidv4(), type: 'Node', x, y, isInitial: true });
-      this.hasInitialState = true;
-    } else if (!this.hasInitialState && itemType !== 'InitialNode') {
-      alert('Please add an initial state before adding other items.');
-    } else if (itemType === 'Node' && this.hasInitialState) {
-      this.nodes.push({ id: uuidv4(), type: itemType, x, y, isInitial: false });
-    } else if (itemType === 'Edge' && this.hasInitialState && this.nodes.length >= 2) {
-      const fromNode = this.nodes[this.nodes.length - 2];
-      const toNode = this.nodes[this.nodes.length - 1];
-      if (fromNode && toNode) {
-        this.edges.push({
-          id: uuidv4(),
-          fromNodeId: fromNode.id,
-          toNodeId: toNode.id,
-          x1: fromNode.x + 20,
-          y1: fromNode.y + 20,
-          x2: toNode.x + 20,
-          y2: toNode.y + 20,
-        });
+      const movingItemIndex = dataTransfer.getData('movingItemIndex');
+      if (movingItemIndex !== '') {
+        const index = parseInt(movingItemIndex);
+        if (!isNaN(index) && this.nodes[index]) {
+          this.nodes[index].x = x;
+          this.nodes[index].y = y;
+          this.updateEdges();
+        }
+      } else {
+        const itemType = dataTransfer.getData('type');
+        if (itemType === 'InitialNode' && !this.hasInitialState) {
+          this.nodes.push({ id: uuidv4(), type: 'Node', x, y, isInitial: true });
+          this.hasInitialState = true;
+        } else if (!this.hasInitialState && itemType !== 'InitialNode') {
+          alert('Please add an initial state before adding other items.');
+        } else if (itemType === 'Node' && this.hasInitialState) {
+          this.nodes.push({ id: uuidv4(), type: itemType, x, y, isInitial: false });
+        } else if (itemType === 'Edge' && this.hasInitialState && this.nodes.length >= 2) {
+          const fromNode = this.nodes[this.nodes.length - 2];
+          const toNode = this.nodes[this.nodes.length - 1];
+          if (fromNode && toNode) {
+            this.edges.push({
+              id: uuidv4(),
+              fromNodeId: fromNode.id,
+              toNodeId: toNode.id,
+              x1: fromNode.x + 20,
+              y1: fromNode.y + 20,
+              x2: toNode.x + 20,
+              y2: toNode.y + 20,
+            });
+          }
+        }
       }
-    }
-  }
-},
+    },
 
     updateEdges() {
       this.edges.forEach(edge => {
         const fromNode = this.nodes.find(node => node.id === edge.fromNodeId);
         const toNode = this.nodes.find(node => node.id === edge.toNodeId);
         if (fromNode && toNode) {
-          edge.x1 = fromNode.x + 20;
-          edge.y1 = fromNode.y + 20;
-          edge.x2 = toNode.x + 20;
-          edge.y2 = toNode.y + 20;
+          const offset = 22; 
+          edge.x1 = fromNode.x + offset;
+          edge.y1 = fromNode.y + offset;
+          edge.x2 = toNode.x + offset;
+          edge.y2 = toNode.y + offset;
         }
       });
-    },
+    }
+
+    ,
   },
 };
 </script>
