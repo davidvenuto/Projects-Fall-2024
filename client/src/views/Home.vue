@@ -36,12 +36,12 @@
             left: item.x + 'px',
             top: item.y + 'px'
           }" 
-          :class="item.type === 'Node' ? 'node' : 'edge'" 
+          :class="item.isInitial ? 'initial-state' : 'node'" 
           class="workspace-item" 
           draggable="true" 
           @dragstart="onItemDragStart($event, index)"
         >
-          <div v-if="item.type === 'Node'" class="node-circle"></div>
+          <div v-if="item.type === 'Node'" :class="{'node-circle': !item.isInitial, 'double-circle': item.isInitial}"></div>
         </div>
       </div>
     </div>
@@ -53,10 +53,17 @@
       <!-- Toolbox items with only visual elements -->
       <div class="toolbox-item" draggable="true" @dragstart="onDragStart($event, 'Node')">
         <div class="node-circle"></div>
+        <p>Normal Node</p>
+      </div>
+
+      <div class="toolbox-item" draggable="true" @dragstart="onDragStart($event, 'InitialNode')">
+        <div class="double-circle"></div>
+        <p>Initial State</p>
       </div>
 
       <div class="toolbox-item" draggable="true" @dragstart="onDragStart($event, 'Edge')">
         <div class="edge-line"></div>
+        <p>Edge</p>
       </div>
     </div>
   </div>
@@ -70,7 +77,7 @@ export default {
   name: 'Home',
   data() {
     return {
-      nodes: [] as { id: string; type: string; x: number; y: number }[],
+      nodes: [] as { id: string; type: string; x: number; y: number; isInitial?: boolean }[],
       edges: [] as { id: string; fromNodeId: string; toNodeId: string; x1: number; y1: number; x2: number; y2: number }[],
     };
   },
@@ -145,7 +152,9 @@ export default {
         // Add a new item
         const itemType = dataTransfer.getData('type');
         if (itemType === 'Node') {
-          this.nodes.push({ id: uuidv4(), type: itemType, x, y });
+          this.nodes.push({ id: uuidv4(), type: itemType, x, y, isInitial: false });
+        } else if (itemType === 'InitialNode') {
+          this.nodes.push({ id: uuidv4(), type: 'Node', x, y, isInitial: true });
         } else if (itemType === 'Edge' && this.nodes.length >= 2) {
           // Automatically connect the last two nodes as an example
           const fromNode = this.nodes[this.nodes.length - 2];
@@ -225,6 +234,28 @@ export default {
   border: 2px solid #333;
 }
 
+.double-circle {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #42b983;
+  border: 2px solid #333;
+}
+
+.double-circle::after {
+  content: "";
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: transparent;
+  border: 2px solid #333;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
 .edge-line {
   width: 60px;
   height: 2px;
@@ -252,6 +283,28 @@ export default {
   border-radius: 50%;
   background-color: #42b983;
   border: 2px solid #333;
+}
+
+.toolbox-item .double-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #42b983;
+  border: 2px solid #333;
+  position: relative;
+}
+
+.toolbox-item .double-circle::after {
+  content: "";
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: transparent;
+  border: 2px solid #333;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .toolbox-item .edge-line {
