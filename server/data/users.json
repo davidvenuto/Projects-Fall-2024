@@ -55,6 +55,14 @@
       "password": "lol",
       "isAdmin": false,
       "userid": 6
+    },
+    {
+      "fullname": "a",
+      "email": "a@.com",
+      "username": "a",
+      "password": "a",
+      "isAdmin": false,
+      "userid": 7
     }
   ]
 }

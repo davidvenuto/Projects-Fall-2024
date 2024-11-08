@@ -15,10 +15,12 @@
         "express": "^4.21.0",
         "html2canvas": "^1.4.1",
         "projects-fall-2024": "file:",
-        "typescript": "^5.3.3"
+        "typescript": "^5.3.3",
+        "uuid": "^11.0.2"
     },
     "devDependencies": {
         "@types/express": "^4.17.21",
+        "@types/uuid": "^10.0.0",
         "nodemon": "3.0.3",
         "ts-node": "^10.9.2"
     }

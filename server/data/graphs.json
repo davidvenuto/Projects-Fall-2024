@@ -1,58 +1,40 @@
 {
     "items": [
-        {
-            "graphid": 0,
-            "name": "Graph0For0",
-            "userid": 0,
-            "description": "Sample finite automaton",
-            "created_at": "2024-10-27T12:34:56Z",
-            "updated_at": "2024-10-27T12:34:56Z",
-            "version": 1
-        },
-        {
-            "graphid": 1,
-            "name": "Graph0For1",
-            "userid": 1,
-            "description": "Another automaton example",
-            "created_at": "2024-10-27T13:34:56Z",
-            "updated_at": "2024-10-27T13:34:56Z",
-            "version": 1
-        },
-     {
-            "graphid": 2,
-            "name": "Graph0For2",
-            "userid": 2,
-            "description": "Yet another automaton example",
-            "created_at": "2024-10-27T14:34:56Z",
-            "updated_at": "2024-10-27T14:34:56Z",
-            "version": 1
-        },
-        {
-            "graphid": 3,
-            "name": "Graph0For3",
-            "userid": 3,
-            "description": "Sample finite automaton 3",
-            "created_at": "2024-10-27T15:34:56Z",
-            "updated_at": "2024-10-27T15:34:56Z",
-            "version": 1
-        },
-        {
-            "graphid": 4,
-            "name": "Graph0For4",
-            "userid": 4,
-            "description": "Another automaton example 4",
-            "created_at": "2024-10-27T16:34:56Z",
-            "updated_at": "2024-10-27T16:34:56Z",
-            "version": 1
-        },
-        {
-            "graphid": 5,
-            "name": "Graph0For5",
-            "userid": 5,
-            "description": "Yet another automaton example 5",
-            "created_at": "2024-10-27T17:34:56Z",
-            "updated_at": "2024-10-27T17:34:56Z",
-            "version": 1
-                }
-            ]
-        }
+      {
+        "graphid": 0,
+        "name": "Graph0For0",
+        "userid": 0,
+        "description": "Sample finite automaton",
+        "created_at": "2024-10-27T12:34:56Z",
+        "updated_at": "2024-10-27T12:34:56Z",
+        "version": 1,
+        "nodes": [
+          { "nodeid": 0, "x": 50, "y": 75 },
+          { "nodeid": 1, "x": 150, "y": 200 },
+          { "nodeid": 2, "x": 250, "y": 100 }
+        ],
+        "edges": [
+          { "from_nodeid": 0, "to_nodeid": 1 },
+          { "from_nodeid": 1, "to_nodeid": 2 },
+          { "from_nodeid": 2, "to_nodeid": 0 }
+        ]
+      },
+      {
+        "graphid": 1,
+        "name": "Graph0For1",
+        "userid": 1,
+        "description": "Another automaton example",
+        "created_at": "2024-10-27T13:34:56Z",
+        "updated_at": "2024-10-27T13:34:56Z",
+        "version": 1,
+        "nodes": [
+          { "nodeid": 0, "x": 70, "y": 80 },
+          { "nodeid": 1, "x": 170, "y": 250 }
+        ],
+        "edges": [
+          { "from_nodeid": 0, "to_nodeid": 1 }
+        ]
+      }
+    ]
+  }
+  
