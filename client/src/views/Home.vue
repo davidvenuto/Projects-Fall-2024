@@ -13,7 +13,6 @@
             <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="20" refY="3.5" orient="auto">
               <polygon points="0 0, 10 3.5, 0 7" fill="black" />
             </marker>
-
           </defs>
           <path v-for="edge in edges" :key="edge.id" :d="'M' + edge.x1 + ',' + edge.y1 + ' L' + edge.x2 + ',' + edge.y2"
             stroke="black" stroke-width="2" fill="none" marker-end="url(#arrowhead)" />
@@ -26,6 +25,7 @@
         }" :class="item.isInitial ? 'initial-state' : 'node'" class="workspace-item" draggable="true"
           @dragstart="onItemDragStart($event, index)">
           <div v-if="item.type === 'Node'" :class="{ 'node-circle': !item.isInitial, 'double-circle': item.isInitial }">
+            <span>{{ item.name }}</span>
           </div>
         </div>
       </div>
@@ -66,9 +66,10 @@ export default {
   name: 'Home',
   data() {
     return {
-      nodes: [] as { id: string; type: string; x: number; y: number; isInitial?: boolean }[],
+      nodes: [] as { id: string; type: string; x: number; y: number; name: string; isInitial?: boolean }[],
       edges: [] as { id: string; fromNodeId: string; toNodeId: string; x1: number; y1: number; x2: number; y2: number }[],
-      hasInitialState: false
+      hasInitialState: false,
+      stateCounter: 0
     };
   },
   methods: {
@@ -126,13 +127,25 @@ export default {
       } else {
         const itemType = dataTransfer.getData('type');
         if (itemType === 'InitialNode' && !this.hasInitialState) {
-          this.nodes.push({ id: uuidv4(), type: 'Node', x, y, isInitial: true });
+          this.nodes.push({
+            id: uuidv4(),
+            type: 'Node',
+            x,
+            y,
+            name: `q${this.stateCounter++}`,
+            isInitial: true
+          });
           this.hasInitialState = true;
-        } else if (!this.hasInitialState && itemType !== 'InitialNode') {
-          alert('Please add an initial state before adding other items.');
-        } else if (itemType === 'Node' && this.hasInitialState) {
-          this.nodes.push({ id: uuidv4(), type: itemType, x, y, isInitial: false });
-        } else if (itemType === 'Edge' && this.hasInitialState && this.nodes.length >= 2) {
+        } else if (this.hasInitialState && itemType === 'Node') {
+          this.nodes.push({
+            id: uuidv4(),
+            type: itemType,
+            x,
+            y,
+            name: `q${this.stateCounter++}`,
+            isInitial: false
+          });
+        } else if (this.hasInitialState && itemType === 'Edge' && this.nodes.length >= 2) {
           const fromNode = this.nodes[this.nodes.length - 2];
           const toNode = this.nodes[this.nodes.length - 1];
           if (fromNode && toNode) {
@@ -163,12 +176,9 @@ export default {
         }
       });
     }
-
-    ,
   },
 };
 </script>
-
 
 <style scoped>
 .container {
@@ -212,6 +222,11 @@ export default {
   border-radius: 50%;
   background-color: #42b983;
   border: 2px solid #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: white;
 }
 
 .double-circle {
@@ -221,6 +236,11 @@ export default {
   border-radius: 50%;
   background-color: #42b983;
   border: 2px solid #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: white;
 }
 
 .double-circle::after {
