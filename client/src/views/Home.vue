@@ -37,25 +37,22 @@
 
       <div class="toolbox-item" draggable="true" @dragstart="onDragStart($event, 'Node')">
         <div class="node-circle"></div>
-        <p>Normal Node</p>
       </div>
 
       <div class="toolbox-item" draggable="true" @dragstart="onDragStart($event, 'InitialNode')">
         <div class="double-circle"></div>
-        <p>Initial State</p>
       </div>
 
       <div class="toolbox-item" draggable="true" @dragstart="onDragStart($event, 'Edge')">
-  <svg width="60" height="10">
-    <defs>
-      <marker id="toolbox-arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-        <polygon points="0 0, 10 3.5, 0 7" fill="black" />
-      </marker>
-    </defs>
-    <line x1="0" y1="5" x2="50" y2="5" stroke="black" stroke-width="2" marker-end="url(#toolbox-arrowhead)" />
-  </svg>
-  <p>Edge</p>
-</div>
+        <svg width="60" height="10">
+          <defs>
+            <marker id="toolbox-arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+              <polygon points="0 0, 10 3.5, 0 7" fill="black" />
+            </marker>
+          </defs>
+          <line x1="0" y1="5" x2="50" y2="5" stroke="black" stroke-width="2" marker-end="url(#toolbox-arrowhead)" />
+        </svg>
+      </div>
 
     </div>
   </div>
@@ -158,7 +155,7 @@ export default {
         const fromNode = this.nodes.find(node => node.id === edge.fromNodeId);
         const toNode = this.nodes.find(node => node.id === edge.toNodeId);
         if (fromNode && toNode) {
-          const offset = 22; 
+          const offset = 22;
           edge.x1 = fromNode.x + offset;
           edge.y1 = fromNode.y + offset;
           edge.x2 = toNode.x + offset;
