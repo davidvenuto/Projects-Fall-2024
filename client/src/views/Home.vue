@@ -14,15 +14,21 @@
               <polygon points="0 0, 10 3.5, 0 7" fill="black" />
             </marker>
           </defs>
-          <path v-for="edge in edges" :key="edge.id" :d="'M' + edge.x1 + ',' + edge.y1 + ' L' + edge.x2 + ',' + edge.y2"
-            stroke="black" stroke-width="2" fill="none" marker-end="url(#arrowhead)" />
 
-          <text v-for="edge in edges" :key="edge.id + '-label'" :x="(edge.x1 + edge.x2) / 2"
-            :y="((edge.y1 + edge.y2) / 2) - 10" fill="black" font-size="30" text-anchor="middle">
+          <path v-for="edge in edges" :key="edge.id" :d="edge.isSelfLoop
+            ? 'M ' + edge.x1 + ',' + edge.y1 + ' a 20,20 0 1,1 40,0 a 20,20 0 1,1 -40,0'
+            : 'M' + edge.x1 + ',' + edge.y1 + ' L' + edge.x2 + ',' + edge.y2" stroke="black" stroke-width="2" fill="none"
+            :marker-end="edge.isSelfLoop ? '' : 'url(#arrowhead)'" />
+
+
+          <text v-for="edge in edges" :key="edge.id + '-label'"
+            :x="edge.isSelfLoop ? edge.x1 + 20 : (edge.x1 + edge.x2) / 2"
+            :y="edge.isSelfLoop ? edge.y1 - 30 : ((edge.y1 + edge.y2) / 2) - 10" fill="black" font-size="18"
+            text-anchor="middle">
             {{ edge.label }}
           </text>
-
         </svg>
+
 
         <div v-for="(item, index) in nodes" :key="index" :style="{
           position: 'absolute',
@@ -40,6 +46,17 @@
     <div class="toolbox">
       <h2>Toolbox</h2>
       <p>Drag items from here:</p>
+      
+      <div class="toolbox-item" draggable="true" @dragstart="onDragStart($event, 'SelfLoop')">
+  <svg width="60" height="60">
+    <path d="M 20,40 C 10,20, 50,20, 40,40" stroke="black" stroke-width="2" fill="none" />
+    <polygon points="37,36 45,40 37,44" fill="black" />
+  </svg>
+</div>
+
+
+
+
 
       <div class="toolbox-item" draggable="true" @dragstart="onDragStart($event, 'Node')">
         <div class="node-circle"></div>
@@ -81,12 +98,14 @@ export default {
         y1: number;
         x2: number;
         y2: number;
-        label: string; 
+        label: string;
+        isSelfLoop?: boolean;
       }[],
       hasInitialState: false,
       stateCounter: 0
     };
   },
+
 
   methods: {
     saveAsImage() {
@@ -181,12 +200,29 @@ export default {
               y1: fromNode.y + 20,
               x2: toNode.x + 20,
               y2: toNode.y + 20,
-              label: label || '' 
+              label: label || ''
+            });
+          }
+        } else if (this.hasInitialState && itemType === 'SelfLoop') {
+          const targetNode = this.nodes[this.nodes.length - 1]; // Choose the last placed node for simplicity
+          if (targetNode) {
+            const label = prompt("Enter label for this self-loop (e.g., 'a'):", "");
+            this.edges.push({
+              id: uuidv4(),
+              fromNodeId: targetNode.id,
+              toNodeId: targetNode.id,
+              x1: targetNode.x,
+              y1: targetNode.y,
+              x2: targetNode.x,
+              y2: targetNode.y,
+              label: label || '',
+              isSelfLoop: true // Indicate that this is a self-loop
             });
           }
         }
       }
-    },
+    }
+    ,
 
     updateEdges() {
       this.edges.forEach(edge => {
