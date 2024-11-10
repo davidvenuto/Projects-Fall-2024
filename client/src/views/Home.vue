@@ -126,6 +126,12 @@ export default {
         }
       } else {
         const itemType = dataTransfer.getData('type');
+
+        if (!this.hasInitialState && itemType !== 'InitialNode') {
+          alert('Please place an initial state first.');
+          return;
+        }
+
         if (itemType === 'InitialNode' && !this.hasInitialState) {
           this.nodes.push({
             id: uuidv4(),
@@ -161,7 +167,8 @@ export default {
           }
         }
       }
-    },
+    }
+    ,
 
     updateEdges() {
       this.edges.forEach(edge => {
