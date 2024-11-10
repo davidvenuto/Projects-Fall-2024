@@ -16,6 +16,12 @@
           </defs>
           <path v-for="edge in edges" :key="edge.id" :d="'M' + edge.x1 + ',' + edge.y1 + ' L' + edge.x2 + ',' + edge.y2"
             stroke="black" stroke-width="2" fill="none" marker-end="url(#arrowhead)" />
+
+          <text v-for="edge in edges" :key="edge.id + '-label'" :x="(edge.x1 + edge.x2) / 2"
+            :y="((edge.y1 + edge.y2) / 2) - 10" fill="black" font-size="30" text-anchor="middle">
+            {{ edge.label }}
+          </text>
+
         </svg>
 
         <div v-for="(item, index) in nodes" :key="index" :style="{
@@ -67,11 +73,21 @@ export default {
   data() {
     return {
       nodes: [] as { id: string; type: string; x: number; y: number; name: string; isInitial?: boolean }[],
-      edges: [] as { id: string; fromNodeId: string; toNodeId: string; x1: number; y1: number; x2: number; y2: number }[],
+      edges: [] as {
+        id: string;
+        fromNodeId: string;
+        toNodeId: string;
+        x1: number;
+        y1: number;
+        x2: number;
+        y2: number;
+        label: string; // Add label property here
+      }[],
       hasInitialState: false,
       stateCounter: 0
     };
   },
+
   methods: {
     saveAsImage() {
       const workspace = this.$refs.workspace as HTMLElement;
@@ -155,6 +171,10 @@ export default {
           const fromNode = this.nodes[this.nodes.length - 2];
           const toNode = this.nodes[this.nodes.length - 1];
           if (fromNode && toNode) {
+            // Prompt the user to enter a label for the edge
+            const label = prompt("Enter label for this edge (e.g., 'a' for q0 to q1 transition):", "");
+
+            // Create the edge with the label
             this.edges.push({
               id: uuidv4(),
               fromNodeId: fromNode.id,
@@ -163,11 +183,13 @@ export default {
               y1: fromNode.y + 20,
               x2: toNode.x + 20,
               y2: toNode.y + 20,
+              label: label || '' // Use an empty string if the user cancels
             });
           }
         }
       }
     }
+
     ,
 
     updateEdges() {
