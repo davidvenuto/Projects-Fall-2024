@@ -81,7 +81,7 @@ export default {
         y1: number;
         x2: number;
         y2: number;
-        label: string; // Add label property here
+        label: string; 
       }[],
       hasInitialState: false,
       stateCounter: 0
@@ -171,10 +171,8 @@ export default {
           const fromNode = this.nodes[this.nodes.length - 2];
           const toNode = this.nodes[this.nodes.length - 1];
           if (fromNode && toNode) {
-            // Prompt the user to enter a label for the edge
             const label = prompt("Enter label for this edge (e.g., 'a' for q0 to q1 transition):", "");
 
-            // Create the edge with the label
             this.edges.push({
               id: uuidv4(),
               fromNodeId: fromNode.id,
@@ -183,14 +181,12 @@ export default {
               y1: fromNode.y + 20,
               x2: toNode.x + 20,
               y2: toNode.y + 20,
-              label: label || '' // Use an empty string if the user cancels
+              label: label || '' 
             });
           }
         }
       }
-    }
-
-    ,
+    },
 
     updateEdges() {
       this.edges.forEach(edge => {
