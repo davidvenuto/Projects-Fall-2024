@@ -204,7 +204,7 @@ export default {
             });
           }
         } else if (this.hasInitialState && itemType === 'SelfLoop') {
-          const targetNode = this.nodes[this.nodes.length - 1]; // Choose the last placed node for simplicity
+          const targetNode = this.nodes[this.nodes.length - 1]; 
           if (targetNode) {
             const label = prompt("Enter label for this self-loop (e.g., 'a'):", "");
             this.edges.push({
@@ -216,7 +216,7 @@ export default {
               x2: targetNode.x,
               y2: targetNode.y,
               label: label || '',
-              isSelfLoop: true // Indicate that this is a self-loop
+              isSelfLoop: true 
             });
           }
         }
