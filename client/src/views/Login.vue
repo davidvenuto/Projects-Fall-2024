@@ -37,26 +37,27 @@ export default defineComponent({
     const showModal = ref(false);
 
     const handleLogin = async () => {
-      try {
-        const response = await fetch('/api/users/login', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ email: email.value, password: password.value })
-        });
-        if (!response.ok) {
-          throw new Error('Invalid email or password');
-        }
-        const data = await response.json();
-        console.log('User logged in:', data.user);
-        error.value = '';
-        showModal.value = true;
-        // Handle successful login (e.g., store user info, redirect)
-      } catch (err: any) {
-        error.value = err.message;
-      }
-    };
+  try {
+    const response = await fetch('/api/users/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email: email.value, password: password.value })
+    });
+    if (!response.ok) {
+      throw new Error('Invalid email or password');
+    }
+    const data = await response.json();
+    localStorage.setItem('token', data.token);
+    error.value = '';
+    showModal.value = true;
+    console.log('User logged in:', data.user); 
+  } catch (err: any) {
+    error.value = err.message;
+  }
+};
+
 
     const closeModal = () => {
       showModal.value = false;

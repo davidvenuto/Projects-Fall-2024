@@ -54,10 +54,6 @@
   </svg>
 </div>
 
-
-
-
-
       <div class="toolbox-item" draggable="true" @dragstart="onDragStart($event, 'Node')">
         <div class="node-circle"></div>
       </div>
