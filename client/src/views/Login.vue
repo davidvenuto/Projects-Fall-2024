@@ -26,42 +26,55 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { defineComponent, ref, inject, Ref } from 'vue'; // Import Ref from 'vue'
+import { useRouter } from 'vue-router';
 
 export default defineComponent({
   name: 'Login',
   setup() {
+    const router = useRouter();
     const email = ref('');
     const password = ref('');
     const error = ref('');
     const showModal = ref(false);
 
-    const handleLogin = async () => {
-  try {
-    const response = await fetch('/api/users/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ email: email.value, password: password.value })
-    });
-    if (!response.ok) {
-      throw new Error('Invalid email or password');
-    }
-    const data = await response.json();
-    localStorage.setItem('token', data.token);
-    error.value = '';
-    showModal.value = true;
-    console.log('User logged in:', data.user); 
-  } catch (err: any) {
-    error.value = err.message;
-  }
-};
+    // Inject the provided username with an explicit type
+    const username = inject<Ref<string | null>>('username');
 
+    const handleLogin = async () => {
+      try {
+        console.log("Attempting login...");
+        const response = await fetch('/api/users/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ email: email.value, password: password.value })
+        });
+
+        if (!response.ok) {
+          throw new Error('Invalid email or password');
+        }
+
+        const data = await response.json();
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('username', data.user.username);
+
+        // Update the injected username to make it reactive immediately
+        if (username) username.value = data.user.username;
+
+        error.value = '';
+        showModal.value = true;
+        router.push({ name: 'Home' });
+      } catch (err) {
+        const errorMessage = (err as Error).message;
+        error.value = errorMessage;
+        console.error("Error logging in:", errorMessage);
+      }
+    };
 
     const closeModal = () => {
       showModal.value = false;
-      // Optionally, redirect to another page
     };
 
     return {
@@ -72,9 +85,12 @@ export default defineComponent({
       showModal,
       closeModal
     };
-  },
+  }
 });
 </script>
+
+
+
 
 <style scoped>
 .login-container {

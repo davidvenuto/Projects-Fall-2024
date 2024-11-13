@@ -30,21 +30,32 @@ app
 
     app.post('/login', (req, res, next) => {
         const { email, password } = req.body;
+    
         if (!email || !password) {
-          return res.status(400).json({ success: false, message: 'Email and password are required' });
+            return res.status(400).json({ success: false, message: 'Email and password are required' });
         }
-        
+    
         users.getAll()
-          .then(all => {
-            const user = all.find(u => u.email === email && u.password === password);
-            if (user) {
-              const token = jwt.sign({ userId: user.id }, 'YOUR_SECRET_KEY', { expiresIn: '1h' }); // Generate token with user ID
-              res.json({ success: true, token, user: { ...user, password: undefined } });
-            } else {
-              res.status(401).json({ success: false, message: 'Invalid email or password' });
-            }
-          }).catch(next);
-      })
+            .then(all => {
+                const user = all.find(u => u.email === email && u.password === password);
+                if (user) {
+                    // Generate JWT token
+                    const token = jwt.sign({ userId: user.id }, 'YOUR_SECRET_KEY', { expiresIn: '1h' });
+                    
+                    // Return response in the required format
+                    res.json({
+                        success: true,
+                        token: token,
+                        user: {
+                            username: user.username  // Assuming `user.username` exists
+                        }
+                    });
+                } else {
+                    res.status(401).json({ success: false, message: 'Invalid email or password' });
+                }
+            })
+            .catch(next);
+    })
 
     .patch('/:id', (req, res, next) => {
         const user = req.body;
