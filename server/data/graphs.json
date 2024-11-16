@@ -2,54 +2,218 @@
   "items": [
     {
       "graphid": 0,
-      "name": "Graph0For0",
-      "userid": 0,
-      "description": "Sample finite automaton",
-      "created_at": "2024-10-27T12:34:56Z",
-      "updated_at": "2024-10-27T12:34:56Z",
-      "version": 1,
-      "nodes": [
-        { "nodeid": "0", "x": 50, "y": 75 },
-        { "nodeid": "1", "x": 150, "y": 200 },
-        { "nodeid": "2", "x": 250, "y": 100 }
-      ],
-      "edges": [
-        { "from_nodeid": "0", "to_nodeid": "1" },
-        { "from_nodeid": "1", "to_nodeid": "2" },
-        { "from_nodeid": "2", "to_nodeid": "0" }
-      ]
-    },
-    {
-      "graphid": 1,
-      "name": "Graph0For1",
-      "userid": 1,
-      "description": "Another automaton example",
-      "created_at": "2024-10-27T13:34:56Z",
-      "updated_at": "2024-10-27T13:34:56Z",
-      "version": 1,
-      "nodes": [
-        { "nodeid": "0", "x": 70, "y": 80 },
-        { "nodeid": "1", "x": 170, "y": 250 }
-      ],
-      "edges": [
-        { "from_nodeid": "0", "to_nodeid": "1" }
-      ]
-    },
-    {
-      "graphid": 2,
       "name": "Untitled Graph",
-      "userid": null,
+      "userid": 0,
       "description": "Graph created via the workspace",
       "created_at": "2024-11-16T19:56:39.293Z",
       "updated_at": "2024-11-16T19:56:39.293Z",
       "version": 1,
       "nodes": [
-        { "nodeid": "f63df791-5f92-47e5-9927-f2f46958c088", "x": 256, "y": 170.671875 },
-        { "nodeid": "950ff2fb-ccf6-49cf-b7c9-3bb32b0519b4", "x": 722, "y": 74.671875 }
+        {
+          "nodeid": "0",
+          "x": 256,
+          "y": 170.671875
+        },
+        {
+          "nodeid": "1",
+          "x": 722,
+          "y": 74.671875
+        }
       ],
       "edges": [
-        { "from_nodeid": "f63df791-5f92-47e5-9927-f2f46958c088", "to_nodeid": "950ff2fb-ccf6-49cf-b7c9-3bb32b0519b4" }
+        {
+          "from_nodeid": "0",
+          "to_nodeid": "1"
+        }
       ]
+    },
+    {
+      "graphid": 1,
+      "name": "Untitled Graph",
+      "userid": 1,
+      "description": "Graph created via the workspace",
+      "created_at": "2024-11-16T21:28:06.127Z",
+      "updated_at": "2024-11-16T21:28:06.127Z",
+      "version": 1,
+      "nodes": [
+        {
+          "nodeid": "0",
+          "x": 324,
+          "y": 106.671875
+        },
+        {
+          "nodeid": "1",
+          "x": 610,
+          "y": 49.671875
+        }
+      ],
+      "edges": [
+        {
+          "from_nodeid": "0",
+          "to_nodeid": "1"
+        }
+      ]
+    },
+    {
+      "graphid": 2,
+      "name": "Untitled Graph",
+      "userid": 2,
+      "description": "Graph created via the workspace",
+      "created_at": "2024-11-16T21:31:10.494Z",
+      "updated_at": "2024-11-16T21:31:10.494Z",
+      "version": 1,
+      "nodes": [
+        {
+          "nodeid": "0",
+          "x": 225,
+          "y": 106.671875
+        },
+        {
+          "nodeid": "1",
+          "x": 576,
+          "y": 62.671875
+        }
+      ],
+      "edges": [
+        {
+          "from_nodeid": "0",
+          "to_nodeid": "1"
+        }
+      ]
+    },
+    {
+      "graphid": 3,
+      "name": "Untitled Graph",
+      "userid": 3,
+      "description": "Graph created via the workspace",
+      "created_at": "2024-11-16T21:34:00.739Z",
+      "updated_at": "2024-11-16T21:34:00.739Z",
+      "version": 1,
+      "nodes": [
+        {
+          "nodeid": "0",
+          "x": 334,
+          "y": 100.671875
+        },
+        {
+          "nodeid": "1",
+          "x": 702,
+          "y": 56.671875
+        }
+      ],
+      "edges": [
+        {
+          "from_nodeid": "0",
+          "to_nodeid": "1"
+        }
+      ]
+    },
+    {
+      "graphid": 4,
+      "name": "Untitled Graph",
+      "userid": 4,
+      "description": "Graph created via the workspace",
+      "created_at": "2024-11-16T22:43:52.639Z",
+      "updated_at": "2024-11-16T22:43:52.639Z",
+      "version": 1,
+      "nodes": [
+        {
+          "nodeid": "0",
+          "x": 241,
+          "y": 90.671875
+        },
+        {
+          "nodeid": "1",
+          "x": 573,
+          "y": 48.671875
+        }
+      ],
+      "edges": [
+        {
+          "from_nodeid": "0",
+          "to_nodeid": "1"
+        }
+      ]
+    },
+    {
+      "graphid": 5,
+      "name": "Untitled Graph",
+      "userid": 5,
+      "description": "Graph created via the workspace",
+      "created_at": "2024-11-16T22:46:00.123Z",
+      "updated_at": "2024-11-16T22:46:00.123Z",
+      "version": 1,
+      "nodes": [
+        {
+          "nodeid": "0",
+          "x": 300,
+          "y": 80.671875
+        },
+        {
+          "nodeid": "1",
+          "x": 600,
+          "y": 50.671875
+        }
+      ],
+      "edges": [
+        {
+          "from_nodeid": "0",
+          "to_nodeid": "1"
+        }
+      ]
+    },
+    {
+      "graphid": 6,
+      "name": "Untitled Graph",
+      "userid": 6,
+      "description": "Graph created via the workspace",
+      "created_at": "2024-11-16T22:50:30.456Z",
+      "updated_at": "2024-11-16T22:50:30.456Z",
+      "version": 1,
+      "nodes": [
+        {
+          "nodeid": "0",
+          "x": 350,
+          "y": 120.671875
+        },
+        {
+          "nodeid": "1",
+          "x": 650,
+          "y": 60.671875
+        }
+      ],
+      "edges": [
+        {
+          "from_nodeid": "0",
+          "to_nodeid": "1"
+        }
+      ]
+    },
+    {
+      "name": "Untitled Graph",
+      "description": "Graph created via the workspace",
+      "nodes": [
+        {
+          "nodeid": "8501f28f-4a1e-4e33-a9c4-92f5af6ff840",
+          "x": 291,
+          "y": 109.671875
+        },
+        {
+          "nodeid": "8a1c883f-e255-4873-a26b-a62ee9fb5ad3",
+          "x": 664,
+          "y": 38.671875
+        }
+      ],
+      "edges": [
+        {
+          "from_nodeid": "8501f28f-4a1e-4e33-a9c4-92f5af6ff840",
+          "to_nodeid": "8a1c883f-e255-4873-a26b-a62ee9fb5ad3"
+        }
+      ],
+      "graphid": 7,
+      "created_at": "2024-11-16T22:56:22.236Z",
+      "updated_at": "2024-11-16T22:56:22.236Z",
+      "version": 1
     }
   ]
 }
