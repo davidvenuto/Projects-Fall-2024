@@ -55,6 +55,14 @@
       "password": "lol",
       "isAdmin": false,
       "userid": 6
+    },
+    {
+      "fullname": "James Whitmore",
+      "email": "abc@gmail.com",
+      "username": "HellYeah",
+      "password": "lol",
+      "isAdmin": false,
+      "userid": 7
     }
   ]
 }

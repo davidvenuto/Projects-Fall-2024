@@ -4,6 +4,7 @@
       <div class="workspace-header">
         <h2 class="workspace-title">Workspace</h2>
         <p>Drop items here</p>
+        <button @click="saveGraph">Save Graph to Database</button>
         <button @click="saveAsImage">Save Workspace as Image</button>
       </div>
 
@@ -17,8 +18,8 @@
 
           <path v-for="edge in edges" :key="edge.id" :d="edge.isSelfLoop
             ? 'M ' + edge.x1 + ',' + edge.y1 + ' a 20,20 0 1,1 40,0 a 20,20 0 1,1 -40,0'
-            : 'M' + edge.x1 + ',' + edge.y1 + ' L' + edge.x2 + ',' + edge.y2" stroke="black" stroke-width="2" fill="none"
-            :marker-end="edge.isSelfLoop ? '' : 'url(#arrowhead)'" />
+            : 'M' + edge.x1 + ',' + edge.y1 + ' L' + edge.x2 + ',' + edge.y2" stroke="black" stroke-width="2"
+            fill="none" :marker-end="edge.isSelfLoop ? '' : 'url(#arrowhead)'" />
 
 
           <text v-for="edge in edges" :key="edge.id + '-label'"
@@ -46,13 +47,13 @@
     <div class="toolbox">
       <h2>Toolbox</h2>
       <p>Drag items from here:</p>
-      
+
       <div class="toolbox-item" draggable="true" @dragstart="onDragStart($event, 'SelfLoop')">
-  <svg width="60" height="60">
-    <path d="M 20,40 C 10,20, 50,20, 40,40" stroke="black" stroke-width="2" fill="none" />
-    <polygon points="37,36 45,40 37,44" fill="black" />
-  </svg>
-</div>
+        <svg width="60" height="60">
+          <path d="M 20,40 C 10,20, 50,20, 40,40" stroke="black" stroke-width="2" fill="none" />
+          <polygon points="37,36 45,40 37,44" fill="black" />
+        </svg>
+      </div>
 
       <div class="toolbox-item" draggable="true" @dragstart="onDragStart($event, 'Node')">
         <div class="node-circle"></div>
@@ -115,6 +116,48 @@ export default {
         link.click();
       });
     },
+
+    async saveGraph() {
+  try {
+    // Collect the graph data
+    const graphData = {
+      name: "Untitled Graph",
+      description: "Graph created via the workspace",
+      nodes: this.nodes.map(node => ({
+        nodeid: node.id,
+        x: node.x,
+        y: node.y
+      })),
+      edges: this.edges.map(edge => ({
+        from_nodeid: edge.fromNodeId,
+        to_nodeid: edge.toNodeId
+      })),
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      version: 1
+    };
+
+    // Send to the backend
+    const response = await fetch('/api/graphs', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(graphData)
+    });
+
+    const result = await response.json();
+
+    if (result.isSuccess) {
+      alert('Graph saved successfully!');
+    } else {
+      alert('Failed to save graph.');
+    }
+  } catch (error) {
+    console.error('Error saving graph:', error);
+    alert('An error occurred while saving the graph.');
+  }
+},
 
     onDragStart(event: DragEvent, type: string) {
       const dataTransfer = event.dataTransfer;
@@ -200,7 +243,7 @@ export default {
             });
           }
         } else if (this.hasInitialState && itemType === 'SelfLoop') {
-          const targetNode = this.nodes[this.nodes.length - 1]; 
+          const targetNode = this.nodes[this.nodes.length - 1];
           if (targetNode) {
             const label = prompt("Enter label for this self-loop (e.g., 'a'):", "");
             this.edges.push({
@@ -212,7 +255,7 @@ export default {
               x2: targetNode.x,
               y2: targetNode.y,
               label: label || '',
-              isSelfLoop: true 
+              isSelfLoop: true
             });
           }
         }

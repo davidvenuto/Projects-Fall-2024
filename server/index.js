@@ -12,6 +12,9 @@ app.use(express.static(path.join(__dirname, '../client/dist')));
 const usersController = require('./controllers/users');
 app.use('/api/users', usersController);
 
+const graphsController = require('./controllers/graphs');
+app.use('/api/graphs', graphsController);
+
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/dist/index.html'));
 });
