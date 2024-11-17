@@ -57,8 +57,16 @@ export default defineComponent({
         }
 
         const data = await response.json();
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('username', data.user.username);
+
+  // Log the data received from the backend
+  +       console.log('Login response data:', data);
+  console.log('data.user:', data.user);
+
+// Store the token, username, and userid in localStorage
+localStorage.setItem('token', data.token);
+localStorage.setItem('username', data.user.username);
+// After successful login, store 'userid' from 'data.user.userid'
+localStorage.setItem('userid', data.user.userid);
 
         // Update the injected username to make it reactive immediately
         if (username) username.value = data.user.username;

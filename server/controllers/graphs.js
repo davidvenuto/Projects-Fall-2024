@@ -1,5 +1,6 @@
 const express = require('express');
 const graphs = require('../models/graphs'); // Import the model
+const jwt = require('jsonwebtoken'); // Import jsonwebtoken
 const app = express.Router();
 
 // GET all graphs
@@ -20,23 +21,54 @@ app.get('/', async (req, res, next) => {
 app.post('/', async (req, res, next) => {
     const { name, description, nodes, edges } = req.body;
 
-    if (!name || !description || !Array.isArray(nodes) || !Array.isArray(edges)) {
-        return res.status(400).send({
+    // Extract the token from the Authorization header
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1]; // Bearer token
+
+    if (!token) {
+        return res.status(401).send({
             isSuccess: false,
-            message: 'Invalid graph data. Please include name, description, nodes, and edges.',
+            message: 'No token provided. Please log in again.',
         });
     }
 
-    const graph = { name, description, nodes, edges };
-
     try {
+// Ensure the secret key matches the one used during token generation
+const decoded = jwt.verify(token, 'YOUR_SECRET_KEY');
+
+// Extract 'userid' from the token payload
+const userid = decoded.userid;
+
+if (!userid) {
+  return res.status(401).send({
+    isSuccess: false,
+    message: 'Invalid token. User ID not found.',
+  });
+}
+
+// Include 'userid' in the graph object
+const graph = { name, description, nodes, edges, userid };
+
+
+        // Validate the incoming data
+        if (!name || !description || !Array.isArray(nodes) || !Array.isArray(edges)) {
+            return res.status(400).send({
+                isSuccess: false,
+                message: 'Invalid graph data. Please include name, description, nodes, and edges.',
+            });
+        }
+
         const result = await graphs.add(graph);
         res.send({
             data: result,
             isSuccess: true,
         });
     } catch (err) {
-        next(err);
+        console.error('Error in saving graph:', err);
+        res.status(500).send({
+            isSuccess: false,
+            message: 'Error saving graph.',
+        });
     }
 });
 

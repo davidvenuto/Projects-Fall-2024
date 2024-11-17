@@ -82,28 +82,37 @@
 import html2canvas from 'html2canvas';
 import { v4 as uuidv4 } from 'uuid';
 
+interface Node {
+  id: string;
+  type: string;
+  x: number;
+  y: number;
+  name: string;
+  isInitial?: boolean;
+}
+
+interface Edge {
+  id: string;
+  fromNodeId: string;
+  toNodeId: string;
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+  label: string;
+  isSelfLoop?: boolean;
+}
+
 export default {
   name: 'Home',
   data() {
     return {
-      nodes: [] as { id: string; type: string; x: number; y: number; name: string; isInitial?: boolean }[],
-      edges: [] as {
-        id: string;
-        fromNodeId: string;
-        toNodeId: string;
-        x1: number;
-        y1: number;
-        x2: number;
-        y2: number;
-        label: string;
-        isSelfLoop?: boolean;
-      }[],
+      nodes: [] as Node[],
+      edges: [] as Edge[],
       hasInitialState: false,
-      stateCounter: 0
+      stateCounter: 0,
     };
   },
-
-
   methods: {
     saveAsImage() {
       const workspace = this.$refs.workspace as HTMLElement;
@@ -119,31 +128,42 @@ export default {
 
     async saveGraph() {
   try {
-    // Collect the graph data
+    // Get the token and userid from localStorage
+    const token = localStorage.getItem('token');
+    const userid = localStorage.getItem('userid');
+
+    // Check if token and userid exist
+    if (!token || !userid) {
+      alert('No user information found. Please log in again.');
+      return;
+    }
+
     const graphData = {
-      name: "Untitled Graph",
-      description: "Graph created via the workspace",
-      nodes: this.nodes.map(node => ({
-        nodeid: node.id,
-        x: node.x,
-        y: node.y
-      })),
-      edges: this.edges.map(edge => ({
-        from_nodeid: edge.fromNodeId,
-        to_nodeid: edge.toNodeId
-      })),
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      version: 1
-    };
+  name: 'Untitled Graph',
+  description: 'Graph created via the workspace',
+  // Remove 'userid' from here
+  nodes: this.nodes.map((node) => ({
+    nodeid: node.id,
+    x: node.x,
+    y: node.y,
+  })),
+  edges: this.edges.map((edge) => ({
+    from_nodeid: edge.fromNodeId,
+    to_nodeid: edge.toNodeId,
+  })),
+  created_at: new Date().toISOString(),
+  updated_at: new Date().toISOString(),
+  version: 1,
+};
 
     // Send to the backend
     const response = await fetch('/api/graphs', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`, // Include the token in headers
       },
-      body: JSON.stringify(graphData)
+      body: JSON.stringify(graphData),
     });
 
     const result = await response.json();
@@ -163,6 +183,8 @@ export default {
       const dataTransfer = event.dataTransfer;
       if (!dataTransfer) return;
       dataTransfer.setData('type', type);
+
+      // Create an empty drag image
       const img = document.createElement('div');
       img.style.width = '0px';
       img.style.height = '0px';
@@ -191,45 +213,54 @@ export default {
       const y = event.clientY - workspaceRect.top;
 
       const movingItemIndex = dataTransfer.getData('movingItemIndex');
-      if (movingItemIndex !== '') {
+      const itemType = dataTransfer.getData('type');
+
+      if (movingItemIndex) {
         const index = parseInt(movingItemIndex);
         if (!isNaN(index) && this.nodes[index]) {
           this.nodes[index].x = x;
           this.nodes[index].y = y;
           this.updateEdges();
         }
-      } else {
-        const itemType = dataTransfer.getData('type');
+        return;
+      }
 
-        if (!this.hasInitialState && itemType !== 'InitialNode') {
-          alert('Please place an initial state first.');
-          return;
-        }
+      if (!this.hasInitialState && itemType !== 'InitialNode') {
+        alert('Please place an initial state first.');
+        return;
+      }
 
-        if (itemType === 'InitialNode' && !this.hasInitialState) {
-          this.nodes.push({
-            id: uuidv4(),
-            type: 'Node',
-            x,
-            y,
-            name: `q${this.stateCounter++}`,
-            isInitial: true
-          });
-          this.hasInitialState = true;
-        } else if (this.hasInitialState && itemType === 'Node') {
+      switch (itemType) {
+        case 'InitialNode':
+          if (!this.hasInitialState) {
+            this.nodes.push({
+              id: uuidv4(),
+              type: 'Node',
+              x,
+              y,
+              name: `q${this.stateCounter++}`,
+              isInitial: true,
+            });
+            this.hasInitialState = true;
+          }
+          break;
+
+        case 'Node':
           this.nodes.push({
             id: uuidv4(),
             type: itemType,
             x,
             y,
             name: `q${this.stateCounter++}`,
-            isInitial: false
+            isInitial: false,
           });
-        } else if (this.hasInitialState && itemType === 'Edge' && this.nodes.length >= 2) {
-          const fromNode = this.nodes[this.nodes.length - 2];
-          const toNode = this.nodes[this.nodes.length - 1];
-          if (fromNode && toNode) {
-            const label = prompt("Enter label for this edge (e.g., 'a' for q0 to q1 transition):", "");
+          break;
+
+        case 'Edge':
+          if (this.nodes.length >= 2) {
+            const fromNode = this.nodes[this.nodes.length - 2];
+            const toNode = this.nodes[this.nodes.length - 1];
+            const label = prompt("Enter label for this edge (e.g., 'a' for q0 to q1 transition):", '') || '';
 
             this.edges.push({
               id: uuidv4(),
@@ -239,13 +270,15 @@ export default {
               y1: fromNode.y + 20,
               x2: toNode.x + 20,
               y2: toNode.y + 20,
-              label: label || ''
+              label,
             });
           }
-        } else if (this.hasInitialState && itemType === 'SelfLoop') {
+          break;
+
+        case 'SelfLoop':
           const targetNode = this.nodes[this.nodes.length - 1];
           if (targetNode) {
-            const label = prompt("Enter label for this self-loop (e.g., 'a'):", "");
+            const label = prompt("Enter label for this self-loop (e.g., 'a'):", '') || '';
             this.edges.push({
               id: uuidv4(),
               fromNodeId: targetNode.id,
@@ -254,19 +287,21 @@ export default {
               y1: targetNode.y,
               x2: targetNode.x,
               y2: targetNode.y,
-              label: label || '',
-              isSelfLoop: true
+              label,
+              isSelfLoop: true,
             });
           }
-        }
+          break;
+
+        default:
+          break;
       }
-    }
-    ,
+    },
 
     updateEdges() {
-      this.edges.forEach(edge => {
-        const fromNode = this.nodes.find(node => node.id === edge.fromNodeId);
-        const toNode = this.nodes.find(node => node.id === edge.toNodeId);
+      this.edges.forEach((edge) => {
+        const fromNode = this.nodes.find((node) => node.id === edge.fromNodeId);
+        const toNode = this.nodes.find((node) => node.id === edge.toNodeId);
         if (fromNode && toNode) {
           const offset = 22;
           edge.x1 = fromNode.x + offset;
@@ -275,7 +310,7 @@ export default {
           edge.y2 = toNode.y + offset;
         }
       });
-    }
+    },
   },
 };
 </script>
