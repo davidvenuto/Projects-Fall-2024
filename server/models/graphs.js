@@ -33,17 +33,19 @@ async function get(graphid) {
 async function add(graph) {
     const data = await loadData();
     const newGraph = {
-        ...graph,
-        graphid: data.items.length, // Generate a unique ID
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        version: 1,
+      ...graph,
+      graphid: data.items.length, // Generate a unique ID
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      version: 1,
+      userid: graph.userid, // Ensure userid is saved
     };
-
+  
     data.items.push(newGraph);
     await saveData(data);
     return newGraph;
-}
+  }
+  
 
 async function update(graph) {
     const data = await loadData();
@@ -73,10 +75,17 @@ async function remove(graphid) {
     return null;
 }
 
-module.exports = {
+async function getAllByUserId(userid) {
+    const data = await loadData();
+    return data.items.filter(item => item.userid == userid);
+  }
+  
+  module.exports = {
     getAll,
     get,
     add,
     update,
     remove,
-};
+    getAllByUserId, // Export the new function
+  };
+  

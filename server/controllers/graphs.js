@@ -17,6 +17,50 @@ app.get('/', async (req, res, next) => {
     }
 });
 
+// Add this route to handle GET /api/graphs/user
+app.get('/user', async (req, res, next) => {
+    // Extract the token from the Authorization header
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1]; // Bearer token
+  
+    if (!token) {
+      return res.status(401).send({
+        isSuccess: false,
+        message: 'No token provided. Please log in again.',
+      });
+    }
+  
+    try {
+      // Ensure the secret key matches the one used during token generation
+      const decoded = jwt.verify(token, 'YOUR_SECRET_KEY');
+  
+      // Extract 'userid' from the token payload
+      const userid = decoded.userid;
+  
+      if (!userid) {
+        return res.status(401).send({
+          isSuccess: false,
+          message: 'Invalid token. User ID not found.',
+        });
+      }
+  
+      // Get all graphs for this user
+      const userGraphs = await graphs.getAllByUserId(userid);
+  
+      res.send({
+        data: userGraphs,
+        isSuccess: true,
+      });
+    } catch (err) {
+      console.error('Error in fetching user graphs:', err);
+      res.status(500).send({
+        isSuccess: false,
+        message: 'Error fetching user graphs.',
+      });
+    }
+  });
+  
+
 // POST (Add a new graph)
 app.post('/', async (req, res, next) => {
     const { name, description, nodes, edges } = req.body;

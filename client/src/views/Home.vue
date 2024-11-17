@@ -6,6 +6,7 @@
         <p>Drop items here</p>
         <button @click="saveGraph">Save Graph to Database</button>
         <button @click="saveAsImage">Save Workspace as Image</button>
+        <button @click="loadGraph">Load Saved Graph</button>
       </div>
 
       <div class="workspace" ref="workspace" @dragover.prevent="onDragOver" @drop="onDrop">
@@ -62,6 +63,23 @@
           </div>
         </div>
       </div>
+      <!-- Modal for selecting a saved graph -->
+<div v-if="showGraphModal" class="modal-overlay" @click="showGraphModal = false">
+  <div class="modal-content" @click.stop>
+    <h2>Select a Graph to Load</h2>
+    <ul class="graph-list">
+      <li v-for="graph in savedGraphs" :key="graph.graphid">
+        <label>
+          <input type="radio" :value="String(graph.graphid)" v-model="selectedGraphId" />
+          {{ graph.name }} - {{ graph.description }}
+        </label>
+      </li>
+    </ul>
+    <button @click="loadSelectedGraph" :disabled="selectedGraphId === null">Load Graph</button>
+    <button @click="showGraphModal = false">Cancel</button>
+  </div>
+</div>
+
     </div>
 
     <div class="toolbox">
@@ -130,9 +148,92 @@ export default {
       edges: [] as Edge[],
       hasInitialState: false,
       stateCounter: 0,
+      savedGraphs: [] as any[], // To store the list of saved graphs
+      showGraphModal: false, // Controls the display of the modal
+      selectedGraphId: null as string | null,
     };
   },
   methods: {
+    async loadGraph() {
+  try {
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+      alert('No user information found. Please log in again.');
+      return;
+    }
+
+    // Fetch the list of saved graphs from the backend
+    const response = await fetch('/api/graphs/user', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`, // Include the token in headers
+      },
+    });
+
+    const result = await response.json();
+
+    if (result.isSuccess) {
+      this.savedGraphs = result.data;
+      this.showGraphModal = true; // Show the modal to select a graph
+    } else {
+      alert('Failed to load graphs.');
+    }
+  } catch (error) {
+    console.error('Error loading graphs:', error);
+    alert('An error occurred while loading graphs.');
+  }
+},
+
+loadSelectedGraph() {
+  const graph = this.savedGraphs.find((g) => String(g.graphid) === this.selectedGraphId);
+  if (graph) {
+    // Clear current workspace
+    this.nodes = [];
+    this.edges = [];
+    this.stateCounter = graph.nodes.length;
+    this.hasInitialState = false;
+
+    // Load nodes
+    graph.nodes.forEach((nodeData: any) => {
+      const node: Node = {
+        id: nodeData.nodeid,
+        type: 'Node',
+        x: nodeData.x,
+        y: nodeData.y,
+        name: nodeData.name || `q${this.stateCounter++}`,
+        isInitial: nodeData.isInitial || false,
+      };
+      if (node.isInitial) {
+        this.hasInitialState = true;
+      }
+      this.nodes.push(node);
+    });
+
+    // Load edges
+    graph.edges.forEach((edgeData: any) => {
+      const edge: Edge = {
+        id: uuidv4(),
+        fromNodeId: edgeData.from_nodeid,
+        toNodeId: edgeData.to_nodeid,
+        x1: 0,
+        y1: 0,
+        x2: 0,
+        y2: 0,
+        label: edgeData.label || '',
+        isSelfLoop: edgeData.from_nodeid === edgeData.to_nodeid,
+      };
+      this.edges.push(edge);
+    });
+
+    this.updateEdges(); // Update edge positions
+
+    this.showGraphModal = false; // Close the modal
+    this.selectedGraphId = null; // Reset the selected graph ID
+  }
+},
+
+
     saveAsImage() {
       const workspace = this.$refs.workspace as HTMLElement;
       if (!workspace) return;
@@ -162,14 +263,21 @@ export default {
   description: 'Graph created via the workspace',
   // Remove 'userid' from here
   nodes: this.nodes.map((node) => ({
-    nodeid: node.id,
-    x: node.x,
-    y: node.y,
-  })),
-  edges: this.edges.map((edge) => ({
-    from_nodeid: edge.fromNodeId,
-    to_nodeid: edge.toNodeId,
-  })),
+  nodeid: node.id,
+  x: node.x,
+  y: node.y,
+  isInitial: node.isInitial || false,
+  name: node.name,
+})),
+
+
+edges: this.edges.map((edge) => ({
+  from_nodeid: edge.fromNodeId,
+  to_nodeid: edge.toNodeId,
+  label: edge.label || '',
+  isSelfLoop: edge.isSelfLoop || false,
+})),
+
   created_at: new Date().toISOString(),
   updated_at: new Date().toISOString(),
   version: 1,
@@ -318,23 +426,86 @@ export default {
     },
 
     updateEdges() {
-      this.edges.forEach((edge) => {
-        const fromNode = this.nodes.find((node) => node.id === edge.fromNodeId);
-        const toNode = this.nodes.find((node) => node.id === edge.toNodeId);
-        if (fromNode && toNode) {
-          const offset = 22;
-          edge.x1 = fromNode.x + offset;
-          edge.y1 = fromNode.y + offset;
-          edge.x2 = toNode.x + offset;
-          edge.y2 = toNode.y + offset;
-        }
-      });
-    },
+  this.edges.forEach((edge) => {
+    const fromNode = this.nodes.find((node) => node.id === edge.fromNodeId);
+    const toNode = this.nodes.find((node) => node.id === edge.toNodeId);
+    if (fromNode && toNode) {
+      const offset = 25; // Adjust based on node size
+      edge.x1 = fromNode.x + offset;
+      edge.y1 = fromNode.y + offset;
+      edge.x2 = toNode.x + offset;
+      edge.y2 = toNode.y + offset;
+    }
+  });
+},
   },
 };
 </script>
 
 <style scoped>
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background-color: #fff;
+  padding: 30px 40px;
+  border-radius: 8px;
+  text-align: center;
+  width: 400px;
+}
+
+.modal-content h2 {
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.graph-list {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 20px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.graph-list li {
+  margin-bottom: 10px;
+  text-align: left;
+}
+
+.graph-list label {
+  cursor: pointer;
+}
+
+.modal-content button {
+  margin-right: 10px;
+  padding: 10px 15px;
+  background-color: #42b983;
+  color: #ffffff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.modal-content button:hover {
+  background-color: #369f75;
+}
+
+.modal-content button[disabled] {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
 /* Container styling */
 .container {
   display: flex;
@@ -534,7 +705,6 @@ export default {
   stroke: #ffffff;
   fill: #ffffff;
 }
-x
 
 .toolbox-item svg line {
   stroke-width: 2;
