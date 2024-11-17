@@ -13,7 +13,6 @@
           By enabling the generation of XML and LaTeX code directly from the created graphs, the application streamlines the workflow for users who need to incorporate these graphs in academic settings, reducing the time required for such tasks.
           The tool is designed to enhance the educational experience by making graph creation more accessible and efficient.
         </p>
-        <button>Learn More</button>
       </div>
     </div>
   </div>
@@ -26,74 +25,116 @@ export default {
 </script>
 
 <style scoped>
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Open+Sans&display=swap');
+
+/* Container Styling */
 .about-container {
   display: flex;
   justify-content: center;
-  padding: 50px 20px;
-  background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
-  animation: backgroundAnimation 10s infinite alternate;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
 }
 
-@keyframes backgroundAnimation {
-  0% {
-    background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
-  }
-  100% {
-    background: linear-gradient(135deg, #d9e2ec, #f0f4f8);
-  }
-}
-
+/* Card Styling */
 .about-card {
-  max-width: 800px;
+  max-width: 900px;
   background-color: #ffffff;
-  border-radius: 12px;
+  border-radius: 15px;
   overflow: hidden;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  transform: translateY(0);
+  animation: float 6s ease-in-out infinite;
 }
 
-.about-card:hover {
-  transform: scale(1.05);
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
+/* Image Section */
 .about-image {
-  background-image: url('https://source.unsplash.com/collection/190727/800x200');
+  background-image: url('https://source.unsplash.com/collection/190727/900x300');
   background-size: cover;
   background-position: center;
-  padding: 60px 20px;
+  padding: 80px 20px;
   text-align: center;
+  position: relative;
+}
+
+.about-image::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
 }
 
 .about-image h1 {
+  position: relative;
   color: #ffffff;
-  font-size: 36px;
+  font-size: 48px;
   margin: 0;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  z-index: 1;
+  font-family: 'Montserrat', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  animation: fadeInDown 1s ease-out;
 }
 
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Content Section */
 .about-content {
-  padding: 20px;
+  padding: 40px 30px;
 }
 
 .about-content p {
-  color: #333;
-  line-height: 1.6;
-  margin-bottom: 16px;
+  color: #555;
+  line-height: 1.8;
+  margin-bottom: 24px;
+  font-size: 18px;
+  font-family: 'Open Sans', sans-serif;
 }
 
-.about-content button {
-  background-color: #42b983;
-  color: #ffffff;
-  padding: 12px 24px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 16px;
-  transition: background-color 0.3s, transform 0.3s;
+.about-content p:first-letter {
+  font-size: 30px;
+  font-weight: bold;
+  float: left;
+  line-height: 1;
+  margin-right: 8px;
+  color: #379eff;
 }
 
-.about-content button:hover {
-  background-color: #369d72;
-  transform: translateY(-2px);
+/* Responsive Design */
+@media (max-width: 768px) {
+  .about-card {
+    margin: 20px;
+  }
+
+  .about-image h1 {
+    font-size: 36px;
+  }
+
+  .about-content {
+    padding: 30px 20px;
+  }
+
+  .about-content p {
+    font-size: 16px;
+  }
 }
 </style>

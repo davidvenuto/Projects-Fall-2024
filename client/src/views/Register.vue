@@ -108,16 +108,16 @@ export default {
 }
 
 .form-group input:focus {
-  border-color: #42b983;
+  border-color: #18aed3;
   outline: none;
-  box-shadow: 0 0 5px rgba(66, 185, 131, 0.5);
+  box-shadow: 0 0 5px rgba(28, 221, 255, 0.5);
 }
 
 /* Button styling */
 .register-button {
   width: 100%;
   padding: 15px;
-  background-color: #42b983;
+  background-color: #1dbfff;
   color: white;
   border: none;
   border-radius: 4px;
@@ -128,7 +128,7 @@ export default {
 }
 
 .register-button:hover {
-  background-color: #369f75;
+  background-color: #227bff;
 }
 
 /* Responsive design */

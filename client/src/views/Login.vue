@@ -112,28 +112,36 @@ export default defineComponent({
 
 /* Card styling */
 .login-card {
+  max-width: 400px; /* Added to set a maximum width */
+  width: 100%; /* Ensures the card takes full width up to max-width */
   background-color: #ffffff;
-  padding: 40px 30px;
-  border-radius: 10px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  padding: 60px 50px; /* Increased padding for more space */
+  border-radius: 15px; /* Slightly more rounded corners */
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15); /* Enhanced shadow for depth */
   text-align: center;
+  margin: 20px; /* Added margin for spacing on smaller screens */
+  transition: transform 0.3s;
+}
+
+.login-card:hover {
+  transform: translateY(-5px); /* Subtle lift on hover */
 }
 
 .login-card h1 {
-  margin-bottom: 10px;
+  margin-bottom: 15px;
   color: #333;
-  font-size: 28px;
+  font-size: 32px; /* Increased font size */
 }
 
 .login-card p {
-  margin-bottom: 30px;
+  margin-bottom: 35px;
   color: #777;
-  font-size: 16px;
+  font-size: 18px; /* Increased font size */
 }
 
 /* Form styling */
 .login-form .form-group {
-  margin-bottom: 20px;
+  margin-bottom: 25px;
   text-align: left;
 }
 
@@ -146,10 +154,10 @@ export default defineComponent({
 
 .login-form input {
   width: 100%;
-  padding: 12px 15px;
+  padding: 15px 20px; /* Increased padding */
   border: 1px solid #ccc;
   border-radius: 5px;
-  font-size: 16px;
+  font-size: 18px; /* Increased font size */
 }
 
 .login-form input::placeholder {
@@ -157,35 +165,36 @@ export default defineComponent({
 }
 
 .login-form input:focus {
-  border-color: #42b983;
+  border-color: #0b9eff;
   outline: none;
-  box-shadow: 0 0 5px rgba(66, 185, 131, 0.5);
+  box-shadow: 0 0 5px rgba(11, 158, 255, 0.5);
 }
 
 /* Button styling */
 .login-button {
   width: 100%;
-  padding: 15px;
-  background-color: #42b983;
+  padding: 18px; /* Increased padding */
+  background-color: #128cff;
   color: #fff;
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  font-size: 18px;
+  font-size: 20px; /* Increased font size */
   font-weight: bold;
-  margin-top: 10px;
-  transition: background-color 0.3s ease;
+  margin-top: 15px;
+  transition: background-color 0.3s ease, transform 0.3s;
 }
 
 .login-button:hover {
-  background-color: #369f75;
+  background-color: #0084ff;
+  transform: translateY(-2px);
 }
 
 /* Error message styling */
 .error-message {
   color: red;
-  margin-top: 15px;
-  font-size: 16px;
+  margin-top: 20px;
+  font-size: 18px; /* Increased font size */
 }
 
 /* Modal styles */
@@ -237,20 +246,26 @@ export default defineComponent({
 /* Responsive design */
 @media (max-width: 480px) {
   .login-card {
-    padding: 30px 20px;
+    padding: 40px 30px; /* Adjusted padding for small screens */
+    margin: 20px;
   }
 
   .login-card h1 {
-    font-size: 24px;
+    font-size: 28px;
   }
 
   .login-card p {
-    font-size: 14px;
-  }
-
-  .login-button,
-  .close-button {
     font-size: 16px;
   }
+
+  .login-form input {
+    font-size: 16px;
+  }
+
+  .login-button {
+    font-size: 18px;
+    padding: 15px;
+  }
 }
+
 </style>
