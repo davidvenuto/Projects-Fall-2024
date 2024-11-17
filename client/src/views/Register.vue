@@ -1,11 +1,24 @@
 <template>
-  <div>
-    <form @submit.prevent="register">
-      <input v-model="user.fullname" placeholder="Full Name" required />
-      <input v-model="user.email" placeholder="Email" required />
-      <input v-model="user.username" placeholder="Username" required />
-      <input v-model="user.password" type="password" placeholder="Password" required />
-      <button type="submit">Register</button>
+  <div class="register-container">
+    <h1>Register</h1>
+    <form @submit.prevent="register" class="register-form">
+      <div class="form-group">
+        <label for="fullname">Full Name</label>
+        <input v-model="user.fullname" id="fullname" placeholder="Enter your full name" required />
+      </div>
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input v-model="user.email" id="email" type="email" placeholder="Enter your email" required />
+      </div>
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input v-model="user.username" id="username" placeholder="Choose a username" required />
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input v-model="user.password" id="password" type="password" placeholder="Create a password" required />
+      </div>
+      <button type="submit" class="register-button">Register</button>
     </form>
   </div>
 </template>
@@ -46,44 +59,92 @@ export default {
   }
 };
 </script>
+
 <style scoped>
-h1 {
-  color: #42b983;
-}
-form {
+/* Container styling */
+.register-container {
   display: flex;
   flex-direction: column;
-  max-width: 300px;
-  margin: auto;
+  align-items: center;
+  padding: 40px 20px;
+  background-color: #f0f5f9;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
-div {
-  margin-bottom: 10px;
+
+.register-container h1 {
+  color: #333;
+  margin-bottom: 30px;
+  font-size: 32px;
 }
-label {
-  margin-bottom: 5px;
+
+/* Form styling */
+.register-form {
+  width: 100%;
+  max-width: 400px;
 }
-input {
-  padding: 8px;
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  font-weight: 600;
+  margin-bottom: 8px;
+  display: block;
+  color: #555;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px 15px;
   border: 1px solid #ccc;
   border-radius: 4px;
+  font-size: 16px;
 }
-button {
-  padding: 10px;
+
+.form-group input::placeholder {
+  color: #aaa;
+}
+
+.form-group input:focus {
+  border-color: #42b983;
+  outline: none;
+  box-shadow: 0 0 5px rgba(66, 185, 131, 0.5);
+}
+
+/* Button styling */
+.register-button {
+  width: 100%;
+  padding: 15px;
   background-color: #42b983;
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  font-size: 18px;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
 }
-button:hover {
+
+.register-button:hover {
   background-color: #369f75;
 }
-.error {
-  color: red;
-  text-align: center;
+
+/* Responsive design */
+@media (max-width: 480px) {
+  .register-container {
+    padding: 30px 15px;
+  }
+
+  .register-container h1 {
+    font-size: 28px;
+  }
 }
-.success {
-  color: green;
-  text-align: center;
+
+/* Background styling */
+body {
+  background: linear-gradient(to right, #e0f7fa, #80deea);
+  font-family: 'Open Sans', sans-serif;
 }
 </style>

@@ -16,28 +16,48 @@
             </marker>
           </defs>
 
-          <path v-for="edge in edges" :key="edge.id" :d="edge.isSelfLoop
-            ? 'M ' + edge.x1 + ',' + edge.y1 + ' a 20,20 0 1,1 40,0 a 20,20 0 1,1 -40,0'
-            : 'M' + edge.x1 + ',' + edge.y1 + ' L' + edge.x2 + ',' + edge.y2" stroke="black" stroke-width="2"
-            fill="none" :marker-end="edge.isSelfLoop ? '' : 'url(#arrowhead)'" />
+          <path
+            v-for="edge in edges"
+            :key="edge.id"
+            :d="edge.isSelfLoop
+              ? 'M ' + edge.x1 + ',' + edge.y1 + ' a 20,20 0 1,1 40,0 a 20,20 0 1,1 -40,0'
+              : 'M' + edge.x1 + ',' + edge.y1 + ' L' + edge.x2 + ',' + edge.y2"
+            stroke="#333"
+            stroke-width="2"
+            fill="none"
+            :marker-end="edge.isSelfLoop ? '' : 'url(#arrowhead)'"
+          />
 
-
-          <text v-for="edge in edges" :key="edge.id + '-label'"
+          <text
+            v-for="edge in edges"
+            :key="edge.id + '-label'"
             :x="edge.isSelfLoop ? edge.x1 + 20 : (edge.x1 + edge.x2) / 2"
-            :y="edge.isSelfLoop ? edge.y1 - 30 : ((edge.y1 + edge.y2) / 2) - 10" fill="black" font-size="18"
-            text-anchor="middle">
+            :y="edge.isSelfLoop ? edge.y1 - 30 : ((edge.y1 + edge.y2) / 2) - 10"
+            fill="#333"
+            font-size="14"
+            text-anchor="middle"
+          >
             {{ edge.label }}
           </text>
         </svg>
 
-
-        <div v-for="(item, index) in nodes" :key="index" :style="{
-          position: 'absolute',
-          left: item.x + 'px',
-          top: item.y + 'px'
-        }" :class="item.isInitial ? 'initial-state' : 'node'" class="workspace-item" draggable="true"
-          @dragstart="onItemDragStart($event, index)">
-          <div v-if="item.type === 'Node'" :class="{ 'node-circle': !item.isInitial, 'double-circle': item.isInitial }">
+        <div
+          v-for="(item, index) in nodes"
+          :key="index"
+          :style="{
+            position: 'absolute',
+            left: item.x + 'px',
+            top: item.y + 'px'
+          }"
+          :class="item.isInitial ? 'initial-state' : 'node'"
+          class="workspace-item"
+          draggable="true"
+          @dragstart="onItemDragStart($event, index)"
+        >
+          <div
+            v-if="item.type === 'Node'"
+            :class="{ 'node-circle': !item.isInitial, 'double-circle': item.isInitial }"
+          >
             <span>{{ item.name }}</span>
           </div>
         </div>
@@ -50,8 +70,8 @@
 
       <div class="toolbox-item" draggable="true" @dragstart="onDragStart($event, 'SelfLoop')">
         <svg width="60" height="60">
-          <path d="M 20,40 C 10,20, 50,20, 40,40" stroke="black" stroke-width="2" fill="none" />
-          <polygon points="37,36 45,40 37,44" fill="black" />
+          <path d="M 20,40 C 10,20, 50,20, 40,40" stroke="#333" stroke-width="2" fill="none" />
+          <polygon points="37,36 45,40 37,44" fill="#333" />
         </svg>
       </div>
 
@@ -67,13 +87,12 @@
         <svg width="60" height="10">
           <defs>
             <marker id="toolbox-arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-              <polygon points="0 0, 10 3.5, 0 7" fill="black" />
+              <polygon points="0 0, 10 3.5, 0 7" fill="#333" />
             </marker>
           </defs>
-          <line x1="0" y1="5" x2="50" y2="5" stroke="black" stroke-width="2" marker-end="url(#toolbox-arrowhead)" />
+          <line x1="0" y1="5" x2="50" y2="5" stroke="#333" stroke-width="2" marker-end="url(#toolbox-arrowhead)" />
         </svg>
       </div>
-
     </div>
   </div>
 </template>
@@ -316,15 +335,21 @@ export default {
 </script>
 
 <style scoped>
+/* Container styling */
 .container {
   display: flex;
   height: 100vh;
+  background-color: #f0f5f9;
+  font-family: 'Open Sans', sans-serif;
 }
 
+/* Left-side (Workspace area) */
 .left-side {
   display: flex;
   flex-direction: column;
   width: 80%;
+  background-color: #ffffff;
+  border-right: 1px solid #ddd;
 }
 
 .workspace-header {
@@ -333,13 +358,41 @@ export default {
   border-bottom: 1px solid #ddd;
 }
 
-.workspace {
-  flex: 1;
-  background-color: #ffffff;
-  border: 1px solid #ddd;
-  position: relative;
+.workspace-header h2 {
+  margin-top: 0;
+  color: #333;
+  font-size: 24px;
 }
 
+.workspace-header p {
+  color: #777;
+  margin-bottom: 15px;
+}
+
+.workspace-header button {
+  margin-right: 10px;
+  padding: 10px 15px;
+  background-color: #42b983;
+  color: #ffffff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+}
+
+.workspace-header button:hover {
+  background-color: #369f75;
+}
+
+.workspace {
+  flex: 1;
+  background-color: #f9fafc;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Nodes styling */
 .workspace-item {
   cursor: grab;
 }
@@ -352,99 +405,161 @@ export default {
 }
 
 .node-circle {
-  width: 40px;
-  height: 40px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
-  background-color: #42b983;
-  border: 2px solid #333;
+  background-color: #4facfe;
+  border: 2px solid #ffffff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  color: #ffffff;
+  font-weight: bold;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
-  color: white;
+  transition: transform 0.2s ease;
+}
+
+.node-circle:hover {
+  transform: scale(1.05);
 }
 
 .double-circle {
   position: relative;
-  width: 40px;
-  height: 40px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
-  background-color: #42b983;
-  border: 2px solid #333;
+  background-color: #4facfe;
+  border: 2px solid #ffffff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  color: #ffffff;
+  font-weight: bold;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
-  color: white;
+  transition: transform 0.2s ease;
+}
+
+.double-circle:hover {
+  transform: scale(1.05);
 }
 
 .double-circle::after {
-  content: "";
+  content: '';
   position: absolute;
-  width: 28px;
-  height: 28px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   background-color: transparent;
-  border: 2px solid #333;
+  border: 2px solid #ffffff;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
 }
 
-.edge-line {
-  width: 60px;
-  height: 2px;
-  background-color: #333;
-  margin-top: 20px;
+/* Edges styling */
+.edges-layer path {
+  stroke: #333;
+  stroke-width: 2;
 }
 
+.edges-layer text {
+  font-size: 14px;
+  fill: #333;
+}
+
+/* Toolbox styling */
 .toolbox {
   width: 20%;
-  background-color: #f0f0f0;
+  background-color: #2c3e50;
   padding: 20px;
+  color: #ecf0f1;
+}
+
+.toolbox h2 {
+  color: #ecf0f1;
+  margin-top: 0;
+  font-size: 24px;
+}
+
+.toolbox p {
+  color: #bdc3c7;
+  margin-bottom: 20px;
 }
 
 .toolbox-item {
   cursor: grab;
-  margin-bottom: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  margin-bottom: 20px;
+  background-color: #34495e;
+  padding: 15px;
+  border-radius: 8px;
+  text-align: center;
+  transition: background-color 0.3s ease;
 }
 
-.toolbox-item .node-circle {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background-color: #42b983;
-  border: 2px solid #333;
+.toolbox-item:hover {
+  background-color: #3d566e;
 }
 
+.toolbox-item .node-circle,
 .toolbox-item .double-circle {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background-color: #42b983;
-  border: 2px solid #333;
-  position: relative;
+  background-color: #4facfe;
+  border: 2px solid #ffffff;
+  margin: 0 auto;
+  box-shadow: none;
 }
 
 .toolbox-item .double-circle::after {
-  content: "";
-  position: absolute;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background-color: transparent;
-  border: 2px solid #333;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  width: 30px;
+  height: 30px;
+  border: 2px solid #ffffff;
 }
 
-.toolbox-item .edge-line {
-  width: 60px;
-  height: 2px;
-  background-color: #333;
+.toolbox-item svg {
+  display: block;
+  margin: 0 auto;
+}
+
+.toolbox-item svg path,
+.toolbox-item svg line,
+.toolbox-item svg polygon {
+  stroke: #ffffff;
+  fill: #ffffff;
+}
+
+.toolbox-item svg line {
+  stroke-width: 2;
+}
+
+/* Scrollbar customization */
+.toolbox {
+  overflow-y: auto;
+}
+
+.toolbox::-webkit-scrollbar {
+  width: 6px;
+}
+
+.toolbox::-webkit-scrollbar-thumb {
+  background-color: #95a5a6;
+  border-radius: 3px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+  }
+
+  .left-side,
+  .toolbox {
+    width: 100%;
+  }
+
+  .toolbox {
+    order: -1;
+  }
 }
 </style>

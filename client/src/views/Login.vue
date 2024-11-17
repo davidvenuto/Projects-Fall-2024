@@ -1,32 +1,35 @@
 <template>
   <div class="login-container">
-    <h1>Login Page</h1>
-    <p>Welcome to the Login page!</p>
-    <form @submit.prevent="handleLogin">
-      <div class="form-group">
-        <label for="email">Email:</label>
-        <input type="email" id="email" v-model="email" required />
-      </div>
-      <div class="form-group">
-        <label for="password">Password:</label>
-        <input type="password" id="password" v-model="password" required />
-      </div>
-      <button type="submit">Login</button>
-    </form>
-    <div v-if="error" class="error">{{ error }}</div>
+    <div class="login-card">
+      <h1>Welcome Back!</h1>
+      <p>Please log in to continue</p>
+      <form @submit.prevent="handleLogin" class="login-form">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" v-model="email" placeholder="Enter your email" required />
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" v-model="password" placeholder="Enter your password" required />
+        </div>
+        <button type="submit" class="login-button">Login</button>
+      </form>
+      <div v-if="error" class="error-message">{{ error }}</div>
+    </div>
 
+    <!-- Modal for login success -->
     <div v-if="showModal" class="modal-overlay" @click="closeModal">
       <div class="modal-content" @click.stop>
         <h2>Login Successful</h2>
         <p>You have been logged in successfully!</p>
-        <button @click="closeModal">Close</button>
+        <button @click="closeModal" class="close-button">Close</button>
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, inject, Ref } from 'vue'; // Import Ref from 'vue'
+import { defineComponent, ref, inject, Ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 export default defineComponent({
@@ -43,7 +46,7 @@ export default defineComponent({
 
     const handleLogin = async () => {
       try {
-        console.log("Attempting login...");
+        console.log('Attempting login...');
         const response = await fetch('/api/users/login', {
           method: 'POST',
           headers: {
@@ -58,15 +61,14 @@ export default defineComponent({
 
         const data = await response.json();
 
-  // Log the data received from the backend
-  +       console.log('Login response data:', data);
-  console.log('data.user:', data.user);
+        // Log the data received from the backend
+        console.log('Login response data:', data);
+        console.log('data.user:', data.user);
 
-// Store the token, username, and userid in localStorage
-localStorage.setItem('token', data.token);
-localStorage.setItem('username', data.user.username);
-// After successful login, store 'userid' from 'data.user.userid'
-localStorage.setItem('userid', data.user.userid);
+        // Store the token, username, and userid in localStorage
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('username', data.user.username);
+        localStorage.setItem('userid', data.user.id);
 
         // Update the injected username to make it reactive immediately
         if (username) username.value = data.user.username;
@@ -77,7 +79,7 @@ localStorage.setItem('userid', data.user.userid);
       } catch (err) {
         const errorMessage = (err as Error).message;
         error.value = errorMessage;
-        console.error("Error logging in:", errorMessage);
+        console.error('Error logging in:', errorMessage);
       }
     };
 
@@ -97,59 +99,96 @@ localStorage.setItem('userid', data.user.userid);
 });
 </script>
 
-
-
-
 <style scoped>
+/* Background styling */
 .login-container {
-  max-width: 400px;
-  margin: 0 auto;
-  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #e0f7fa, #80deea);
+  font-family: 'Open Sans', sans-serif;
+}
+
+/* Card styling */
+.login-card {
+  background-color: #ffffff;
+  padding: 40px 30px;
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.login-card h1 {
+  margin-bottom: 10px;
+  color: #333;
+  font-size: 28px;
+}
+
+.login-card p {
+  margin-bottom: 30px;
+  color: #777;
+  font-size: 16px;
+}
+
+/* Form styling */
+.login-form .form-group {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.login-form label {
+  display: block;
+  margin-bottom: 8px;
+  color: #555;
+  font-weight: 600;
+}
+
+.login-form input {
+  width: 100%;
+  padding: 12px 15px;
   border: 1px solid #ccc;
   border-radius: 5px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  font-size: 16px;
 }
 
-h1 {
-  color: #42b983;
+.login-form input::placeholder {
+  color: #aaa;
 }
 
-.form-group {
-  margin-bottom: 15px;
+.login-form input:focus {
+  border-color: #42b983;
+  outline: none;
+  box-shadow: 0 0 5px rgba(66, 185, 131, 0.5);
 }
 
-label {
-  display: block;
-  margin-bottom: 5px;
-}
-
-input {
+/* Button styling */
+.login-button {
   width: 100%;
-  padding: 8px;
-  box-sizing: border-box;
-}
-
-button {
+  padding: 15px;
   background-color: #42b983;
-  color: white;
+  color: #fff;
   border: none;
-  padding: 10px 15px;
+  border-radius: 5px;
   cursor: pointer;
+  font-size: 18px;
+  font-weight: bold;
+  margin-top: 10px;
+  transition: background-color 0.3s ease;
 }
 
-button:hover {
-  background-color: #369f6b;
+.login-button:hover {
+  background-color: #369f75;
 }
 
-.error {
+/* Error message styling */
+.error-message {
   color: red;
+  margin-top: 15px;
+  font-size: 16px;
 }
 
-.success {
-  color: green;
-}
-
-/* Modal Styles */
+/* Modal styles */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -164,15 +203,54 @@ button:hover {
 
 .modal-content {
   background-color: #fff;
-  padding: 20px;
-  border-radius: 5px;
+  padding: 30px 40px;
+  border-radius: 8px;
+  text-align: center;
 }
 
 .modal-content h2 {
-  margin-top: 0;
+  margin-bottom: 20px;
+  color: #42b983;
+  font-size: 24px;
 }
 
-.modal-content button {
-  margin-top: 15px;
+.modal-content p {
+  margin-bottom: 25px;
+  color: #555;
+  font-size: 18px;
+}
+
+.close-button {
+  padding: 12px 20px;
+  background-color: #42b983;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.close-button:hover {
+  background-color: #369f75;
+}
+
+/* Responsive design */
+@media (max-width: 480px) {
+  .login-card {
+    padding: 30px 20px;
+  }
+
+  .login-card h1 {
+    font-size: 24px;
+  }
+
+  .login-card p {
+    font-size: 14px;
+  }
+
+  .login-button,
+  .close-button {
+    font-size: 16px;
+  }
 }
 </style>
