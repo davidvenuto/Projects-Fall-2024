@@ -522,12 +522,19 @@ export default {
   margin: 0 auto;
 }
 
-.toolbox-item svg path,
+/* Styles for SVG paths in toolbox items */
+.toolbox-item svg path {
+  stroke: #ffffff;
+  fill: none; /* Ensure paths are not filled */
+}
+
+/* Styles for SVG lines and polygons in toolbox items */
 .toolbox-item svg line,
 .toolbox-item svg polygon {
   stroke: #ffffff;
   fill: #ffffff;
 }
+x
 
 .toolbox-item svg line {
   stroke-width: 2;
