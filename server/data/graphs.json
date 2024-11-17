@@ -247,6 +247,39 @@
       "created_at": "2024-11-17T15:22:39.666Z",
       "updated_at": "2024-11-17T15:22:39.666Z",
       "version": 1
+    },
+    {
+      "name": "Untitled Graph",
+      "description": "Graph created via the workspace",
+      "nodes": [
+        {
+          "nodeid": "1efe9e17-92e1-4998-8076-9f0e936340c5",
+          "x": 271,
+          "y": 194.09375,
+          "isInitial": true,
+          "name": "q0"
+        },
+        {
+          "nodeid": "5e279894-9b3f-43c8-bb07-1822194d214c",
+          "x": 787,
+          "y": 102.09375,
+          "isInitial": false,
+          "name": "q1"
+        }
+      ],
+      "edges": [
+        {
+          "from_nodeid": "1efe9e17-92e1-4998-8076-9f0e936340c5",
+          "to_nodeid": "5e279894-9b3f-43c8-bb07-1822194d214c",
+          "label": "a",
+          "isSelfLoop": false
+        }
+      ],
+      "userid": 6,
+      "graphid": 8,
+      "created_at": "2024-11-17T15:26:52.725Z",
+      "updated_at": "2024-11-17T15:26:52.725Z",
+      "version": 1
     }
   ]
 }

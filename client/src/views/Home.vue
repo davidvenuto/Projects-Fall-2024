@@ -7,6 +7,7 @@
         <button @click="saveGraph">Save Graph to Database</button>
         <button @click="saveAsImage">Save Workspace as Image</button>
         <button @click="loadGraph">Load Saved Graph</button>
+        <button @click="saveGraphsAsJSON">Save JSON</button>
       </div>
 
       <div class="workspace" ref="workspace" @dragover.prevent="onDragOver" @drop="onDrop">
@@ -154,6 +155,47 @@ export default {
     };
   },
   methods: {
+    async saveGraphsAsJSON() {
+  try {
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+      alert('No user information found. Please log in again.');
+      return;
+    }
+
+    // Fetch the user's graphs from the backend
+    const response = await fetch('/api/graphs/user', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    const result = await response.json();
+
+    if (result.isSuccess) {
+      const dataStr = JSON.stringify(result.data, null, 2);
+      const blob = new Blob([dataStr], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'my_graphs.json';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } else {
+      alert('Failed to load graphs.');
+    }
+  } catch (error) {
+    console.error('Error saving JSON:', error);
+    alert('An error occurred while saving the JSON file.');
+  }
+},
+
+
     async loadGraph() {
   try {
     const token = localStorage.getItem('token');
