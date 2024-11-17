@@ -313,6 +313,123 @@
       "created_at": "2024-11-17T15:50:46.634Z",
       "updated_at": "2024-11-17T15:50:46.634Z",
       "version": 1
+    },
+    {
+      "name": "New Graph",
+      "description": "LEL\n",
+      "nodes": [
+        {
+          "nodeid": "8d34dd21-2a6c-4273-87a4-b4057f81bdd5",
+          "x": 155,
+          "y": 59.09375,
+          "isInitial": true,
+          "name": "q0"
+        },
+        {
+          "nodeid": "32e35dce-e16e-4df4-a14b-ead4c5d4bea9",
+          "x": 778,
+          "y": 762.09375,
+          "isInitial": false,
+          "name": "q1"
+        }
+      ],
+      "edges": [
+        {
+          "from_nodeid": "32e35dce-e16e-4df4-a14b-ead4c5d4bea9",
+          "to_nodeid": "32e35dce-e16e-4df4-a14b-ead4c5d4bea9",
+          "label": "a",
+          "isSelfLoop": true
+        },
+        {
+          "from_nodeid": "8d34dd21-2a6c-4273-87a4-b4057f81bdd5",
+          "to_nodeid": "32e35dce-e16e-4df4-a14b-ead4c5d4bea9",
+          "label": "b",
+          "isSelfLoop": false
+        }
+      ],
+      "userid": 6,
+      "graphid": 10,
+      "created_at": "2024-11-17T17:40:38.548Z",
+      "updated_at": "2024-11-17T17:40:38.548Z",
+      "version": 1
+    },
+    {
+      "name": "lel",
+      "description": "lel",
+      "nodes": [
+        {
+          "nodeid": "24d89921-25ad-458f-9701-1299b0d03f1f",
+          "x": 162,
+          "y": 217.09375,
+          "isInitial": true,
+          "name": "q0"
+        },
+        {
+          "nodeid": "f710a764-7c3d-44ab-9c9f-abecb7c7230c",
+          "x": 744,
+          "y": 73.09375,
+          "isInitial": false,
+          "name": "q1"
+        }
+      ],
+      "edges": [
+        {
+          "from_nodeid": "f710a764-7c3d-44ab-9c9f-abecb7c7230c",
+          "to_nodeid": "f710a764-7c3d-44ab-9c9f-abecb7c7230c",
+          "label": "bndfsdfsdfsdf",
+          "isSelfLoop": true
+        }
+      ],
+      "userid": 6,
+      "graphid": 11,
+      "created_at": "2024-11-17T17:42:55.115Z",
+      "updated_at": "2024-11-17T17:42:55.115Z",
+      "version": 1
+    },
+    {
+      "name": "single state",
+      "description": "single state",
+      "nodes": [
+        {
+          "nodeid": "da5ead6d-bf44-4ef3-8c97-57a9b396415a",
+          "x": 619,
+          "y": 191.09375,
+          "isInitial": true,
+          "name": "q0"
+        }
+      ],
+      "edges": [],
+      "userid": 6,
+      "graphid": 12,
+      "created_at": "2024-11-17T17:43:47.650Z",
+      "updated_at": "2024-11-17T17:43:47.650Z",
+      "version": 1
+    },
+    {
+      "name": "sdasd",
+      "description": "sadsada",
+      "nodes": [
+        {
+          "nodeid": "da5ead6d-bf44-4ef3-8c97-57a9b396415a",
+          "x": 619,
+          "y": 191.09375,
+          "isInitial": true,
+          "name": "q0"
+        },
+        {
+          "nodeid": "7f3ede04-b939-431f-a733-ff58b93d1a46",
+          "x": 378,
+          "y": 87.09375,
+          "isInitial": false,
+          "name": "q1"
+        }
+      ],
+      "edges": [],
+      "userid": 6,
+      "graphid": 13,
+      "created_at": "2024-11-17T17:43:59.817Z",
+      "updated_at": "2024-11-17T17:43:59.817Z",
+      "version": 1
     }
   ]
 }

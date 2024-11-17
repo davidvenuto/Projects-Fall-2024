@@ -24,6 +24,7 @@
     color: #333;
   }
   
+  /* Styles for the graph list in the load modal */
   .graph-list {
     list-style: none;
     padding: 0;
@@ -41,6 +42,31 @@
     cursor: pointer;
   }
   
+  /* Styles for the form inside the save graph modal */
+  .form-group {
+    margin-bottom: 15px;
+    text-align: left;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #555;
+  }
+  
+  .form-group input,
+  .form-group textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .form-group textarea {
+    resize: vertical;
+    min-height: 80px;
+  }
+  
   .modal-content button {
     margin-right: 10px;
     padding: 10px 15px;
@@ -50,6 +76,14 @@
     border-radius: 5px;
     cursor: pointer;
     font-size: 14px;
+  }
+  
+  .modal-content button[type="button"] {
+    background-color: #ccc;
+  }
+  
+  .modal-content button[type="button"]:hover {
+    background-color: #b3b3b3;
   }
   
   .modal-content button:hover {
@@ -294,3 +328,4 @@
       order: -1;
     }
   }
+  
