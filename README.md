@@ -17,24 +17,8 @@ The business context for this project is to provide a tool that simplifies the p
 
 # Roadmap
   - [x] Draw out basic design for website including ALL desired features (tentative outline)
-  - [ ] Webpage with drag and drop graphs using HTML/CSS/Javascript/Typescript
-  - [ ] Give users the ability to save their graphs as files (Unsure of what library will be used for this yet).
-  - [ ] Allow users to login to website using Google API
-  - [ ] Allow users to create unique accounts for website and save their files using SQL Database.
+  - [x] Webpage with drag and drop graphs using HTML/CSS/Javascript/Typescript
+  - [x] Give users the ability to save their graphs as files
+  - [x] Allow users to create unique accounts for website and save their files as image/JSON
   - [ ] Let users save their graphs as XML code as opposed to image (using python)
   - [ ] Let users save their graphs as TIKZ/Latex code (using python)
-
-# Week 1
-  - [x] Draw out basic design for website including ALL desired features (tentative outline)
-  - [x] Outline business context
-  - [x] Write up weekly update #1
-
-# Week 2
-- [x] Create a basic front end complete with routes to each page (Using Vue)
-- [x] Mount front end onto router and set up localhost (Using Vite and Express)
-- [ ] Add all desired components for each page
-- [ ] Format the pages with CSS
-
-# Week 3
-
-   ![Projects Picture](https://github.com/user-attachments/assets/ccc29a96-9f2a-4e6e-8868-982152124248)
