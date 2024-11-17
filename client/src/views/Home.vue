@@ -4,10 +4,10 @@
       <div class="workspace-header">
         <h2 class="workspace-title">Workspace</h2>
         <p>Drop items here</p>
-        <button @click="saveGraph">Save Graph to Database</button>
-        <button @click="saveAsImage">Save Workspace as Image</button>
+        <button @click="saveGraph">Save Graph</button>
+        <button @click="saveAsImage">Save Graph as Image</button>
         <button @click="loadGraph">Load Saved Graph</button>
-        <button @click="saveGraphsAsJSON">Save JSON</button>
+        <button @click="saveGraphsAsJSON">Save Graphs Data</button>
       </div>
 
       <div class="workspace" ref="workspace" @dragover.prevent="onDragOver" @drop="onDrop">
