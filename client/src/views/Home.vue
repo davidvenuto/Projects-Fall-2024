@@ -156,114 +156,114 @@ export default {
   },
   methods: {
     async importJSON() {
-  try {
-    const token = localStorage.getItem('token');
+      try {
+        const token = localStorage.getItem('token');
 
-    if (!token) {
-      alert('No user information found. Please log in again.');
-      return;
-    }
-
-    const fileInput = document.createElement('input');
-    fileInput.type = 'file';
-    fileInput.accept = '.json';
-    fileInput.onchange = async (event: Event) => {
-      const input = event.target as HTMLInputElement;
-      if (input.files && input.files[0]) {
-        const file = input.files[0];
-        const text = await file.text();
-        let jsonData;
-
-        try {
-          jsonData = JSON.parse(text);
-        } catch (parseError) {
-          console.error('Invalid JSON format:', parseError);
-          alert('The selected file contains invalid JSON.');
+        if (!token) {
+          alert('No user information found. Please log in again.');
           return;
         }
 
-        // Check if jsonData is an array
-        if (Array.isArray(jsonData)) {
-          if (jsonData.length === 0) {
-            alert('The JSON array is empty.');
-            return;
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = '.json';
+        fileInput.onchange = async (event: Event) => {
+          const input = event.target as HTMLInputElement;
+          if (input.files && input.files[0]) {
+            const file = input.files[0];
+            const text = await file.text();
+            let jsonData;
+
+            try {
+              jsonData = JSON.parse(text);
+            } catch (parseError) {
+              console.error('Invalid JSON format:', parseError);
+              alert('The selected file contains invalid JSON.');
+              return;
+            }
+
+            // Check if jsonData is an array
+            if (Array.isArray(jsonData)) {
+              if (jsonData.length === 0) {
+                alert('The JSON array is empty.');
+                return;
+              }
+
+              // For simplicity, take the first graph in the array
+              jsonData = jsonData[0];
+              // Alternatively, you can implement logic to select which graph to import
+            }
+
+            // Validate JSON Structure
+            if (!jsonData.nodes || !Array.isArray(jsonData.nodes)) {
+              alert('Invalid JSON structure: "nodes" array is missing.');
+              return;
+            }
+
+            if (!jsonData.edges || !Array.isArray(jsonData.edges)) {
+              alert('Invalid JSON structure: "edges" array is missing.');
+              return;
+            }
+
+            // Map and Assign Nodes
+            this.nodes = jsonData.nodes.map((nodeData: any) => {
+              // Assign a unique ID if missing
+              const nodeId = nodeData.nodeid || uuidv4();
+
+              // Ensure required properties are present
+              return {
+                id: nodeId,
+                type: nodeData.type || 'Node',
+                x: nodeData.x || 0,
+                y: nodeData.y || 0,
+                name: nodeData.name || `q${this.stateCounter++}`,
+                isInitial: nodeData.isInitial || false,
+              };
+            });
+
+            // Check for initial state
+            this.hasInitialState = this.nodes.some(node => node.isInitial);
+
+            // Map and Assign Edges
+            this.edges = jsonData.edges.map((edgeData: any) => {
+              // Assign a unique ID if missing
+              const edgeId = uuidv4();
+
+              // Determine if it's a self-loop
+              const isSelfLoop = edgeData.isSelfLoop !== undefined
+                ? edgeData.isSelfLoop
+                : edgeData.from_nodeid === edgeData.to_nodeid;
+
+              return {
+                id: edgeId,
+                fromNodeId: edgeData.fromNodeid,
+                toNodeId: edgeData.to_nodeid,
+                x1: 0, // Will be set in updateEdges
+                y1: 0,
+                x2: 0,
+                y2: 0,
+                label: edgeData.label || '',
+                isSelfLoop: isSelfLoop,
+              };
+            });
+
+            // Update Edge Positions
+            this.updateEdges();
+
+            // Optional: Reset selectedGraphId if necessary
+            this.selectedGraphId = null;
+
+            // Notify the user
+            alert('Graph imported successfully!');
           }
-
-          // For simplicity, take the first graph in the array
-          jsonData = jsonData[0];
-          // Alternatively, you can implement logic to select which graph to import
-        }
-
-        // Validate JSON Structure
-        if (!jsonData.nodes || !Array.isArray(jsonData.nodes)) {
-          alert('Invalid JSON structure: "nodes" array is missing.');
-          return;
-        }
-
-        if (!jsonData.edges || !Array.isArray(jsonData.edges)) {
-          alert('Invalid JSON structure: "edges" array is missing.');
-          return;
-        }
-
-        // Map and Assign Nodes
-        this.nodes = jsonData.nodes.map((nodeData: any) => {
-          // Assign a unique ID if missing
-          const nodeId = nodeData.nodeid || uuidv4();
-
-          // Ensure required properties are present
-          return {
-            id: nodeId,
-            type: nodeData.type || 'Node',
-            x: nodeData.x || 0,
-            y: nodeData.y || 0,
-            name: nodeData.name || `q${this.stateCounter++}`,
-            isInitial: nodeData.isInitial || false,
-          };
-        });
-
-        // Check for initial state
-        this.hasInitialState = this.nodes.some(node => node.isInitial);
-
-        // Map and Assign Edges
-        this.edges = jsonData.edges.map((edgeData: any) => {
-          // Assign a unique ID if missing
-          const edgeId = uuidv4();
-
-          // Determine if it's a self-loop
-          const isSelfLoop = edgeData.isSelfLoop !== undefined
-            ? edgeData.isSelfLoop
-            : edgeData.from_nodeid === edgeData.to_nodeid;
-
-          return {
-            id: edgeId,
-            fromNodeId: edgeData.fromNodeid,
-            toNodeId: edgeData.to_nodeid,
-            x1: 0, // Will be set in updateEdges
-            y1: 0,
-            x2: 0,
-            y2: 0,
-            label: edgeData.label || '',
-            isSelfLoop: isSelfLoop,
-          };
-        });
-
-        // Update Edge Positions
-        this.updateEdges();
-
-        // Optional: Reset selectedGraphId if necessary
-        this.selectedGraphId = null;
-
-        // Notify the user
-        alert('Graph imported successfully!');
+        };
+        fileInput.click();
+      } catch (error) {
+        console.error('Error importing JSON:', error);
+        alert('An error occurred while importing the JSON file.');
       }
-    };
-    fileInput.click();
-  } catch (error) {
-    console.error('Error importing JSON:', error);
-    alert('An error occurred while importing the JSON file.');
-  }
-}
-,
+    }
+    ,
 
     async saveGraphsAsJSON() {
       try {
@@ -306,6 +306,14 @@ export default {
 
     async loadGraph() {
       try {
+        const confirmation = confirm(
+          "Loading a saved graph will discard your current progress. Do you want to continue?"
+        );
+
+        if (!confirmation) {
+          return; // Exit if the user cancels
+        }
+
         const token = localStorage.getItem('token');
 
         if (!token) {
