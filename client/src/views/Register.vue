@@ -61,7 +61,6 @@ export default {
 </script>
 
 <style scoped>
-/* Container styling */
 .register-container {
   display: flex;
   flex-direction: column;
@@ -78,7 +77,6 @@ export default {
   font-size: 32px;
 }
 
-/* Form styling */
 .register-form {
   width: 100%;
   max-width: 400px;
@@ -113,7 +111,6 @@ export default {
   box-shadow: 0 0 5px rgba(28, 221, 255, 0.5);
 }
 
-/* Button styling */
 .register-button {
   width: 100%;
   padding: 15px;
@@ -131,7 +128,6 @@ export default {
   background-color: #227bff;
 }
 
-/* Responsive design */
 @media (max-width: 480px) {
   .register-container {
     padding: 30px 15px;
@@ -142,7 +138,6 @@ export default {
   }
 }
 
-/* Background styling */
 body {
   background: linear-gradient(to right, #e0f7fa, #80deea);
   font-family: 'Open Sans', sans-serif;

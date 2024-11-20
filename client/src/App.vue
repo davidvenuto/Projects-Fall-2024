@@ -26,7 +26,6 @@
         </span>
       </div>
 
-      <!-- Right-side logout button -->
       <div class="nav-right" v-if="username">
         <button @click="logout">LOG OUT</button>
       </div>
@@ -43,9 +42,8 @@ export default defineComponent({
   name: 'App',
   setup() {
     const router = useRouter();
-    const username = ref<string | null>(localStorage.getItem('username')); // Initialize from localStorage
+    const username = ref<string | null>(localStorage.getItem('username'));
 
-    // Provide username to make it reactive across the app
     provide('username', username);
 
     const checkUserSession = () => {

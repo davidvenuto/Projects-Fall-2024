@@ -8,6 +8,7 @@
         <button @click="saveAsImage">Save Graph as Image</button>
         <button @click="loadGraph">Load Saved Graph</button>
         <button @click="saveGraphsAsJSON">Save Graphs Data</button>
+        <button @click="importJSON">Import JSON File</button>
       </div>
 
       <div class="workspace" ref="workspace" @dragover.prevent="onDragOver" @drop="onDrop">
@@ -18,54 +19,31 @@
             </marker>
           </defs>
 
-          <path
-            v-for="edge in edges"
-            :key="edge.id"
-            :d="edge.isSelfLoop
-              ? 'M ' + edge.x1 + ',' + edge.y1 + ' a 20,20 0 1,1 40,0 a 20,20 0 1,1 -40,0'
-              : 'M' + edge.x1 + ',' + edge.y1 + ' L' + edge.x2 + ',' + edge.y2"
-            stroke="#333"
-            stroke-width="2"
-            fill="none"
-            :marker-end="edge.isSelfLoop ? '' : 'url(#arrowhead)'"
-          />
+          <path v-for="edge in edges" :key="edge.id" :d="edge.isSelfLoop
+            ? 'M ' + edge.x1 + ',' + edge.y1 + ' a 20,20 0 1,1 40,0 a 20,20 0 1,1 -40,0'
+            : 'M' + edge.x1 + ',' + edge.y1 + ' L' + edge.x2 + ',' + edge.y2" stroke="#333" stroke-width="2"
+            fill="none" :marker-end="edge.isSelfLoop ? '' : 'url(#arrowhead)'" />
 
-          <text
-            v-for="edge in edges"
-            :key="edge.id + '-label'"
+          <text v-for="edge in edges" :key="edge.id + '-label'"
             :x="edge.isSelfLoop ? edge.x1 + 20 : (edge.x1 + edge.x2) / 2"
-            :y="edge.isSelfLoop ? edge.y1 - 30 : ((edge.y1 + edge.y2) / 2) - 10"
-            fill="#333"
-            font-size="14"
-            text-anchor="middle"
-          >
+            :y="edge.isSelfLoop ? edge.y1 - 30 : ((edge.y1 + edge.y2) / 2) - 10" fill="#333" font-size="14"
+            text-anchor="middle">
             {{ edge.label }}
           </text>
         </svg>
 
-        <div
-          v-for="(item, index) in nodes"
-          :key="index"
-          :style="{
-            position: 'absolute',
-            left: item.x + 'px',
-            top: item.y + 'px'
-          }"
-          :class="item.isInitial ? 'initial-state' : 'node'"
-          class="workspace-item"
-          draggable="true"
-          @dragstart="onItemDragStart($event, index)"
-        >
-          <div
-            v-if="item.type === 'Node'"
-            :class="{ 'node-circle': !item.isInitial, 'double-circle': item.isInitial }"
-          >
+        <div v-for="(item, index) in nodes" :key="index" :style="{
+          position: 'absolute',
+          left: item.x + 'px',
+          top: item.y + 'px'
+        }" :class="item.isInitial ? 'initial-state' : 'node'" class="workspace-item" draggable="true"
+          @dragstart="onItemDragStart($event, index)">
+          <div v-if="item.type === 'Node'" :class="{ 'node-circle': !item.isInitial, 'double-circle': item.isInitial }">
             <span>{{ item.name }}</span>
           </div>
         </div>
       </div>
 
-      <!-- Modal for selecting a saved graph -->
       <div v-if="showGraphModal" class="modal-overlay" @click="showGraphModal = false">
         <div class="modal-content" @click.stop>
           <h2>Select a Graph to Load</h2>
@@ -82,7 +60,6 @@
         </div>
       </div>
 
-      <!-- Modal for entering graph title and description -->
       <div v-if="showSaveModal" class="modal-overlay" @click="closeSaveModal">
         <div class="modal-content" @click.stop>
           <h2>Save Graph</h2>
@@ -169,15 +146,125 @@ export default {
       edges: [] as Edge[],
       hasInitialState: false,
       stateCounter: 0,
-      savedGraphs: [] as any[], // To store the list of saved graphs
-      showGraphModal: false,    // Controls the display of the load graph modal
+      savedGraphs: [] as any[],
+      showGraphModal: false,
       selectedGraphId: null as string | null,
-      showSaveModal: false,     // Controls the display of the save graph modal
-      graphTitle: '',           // User input for graph title
-      graphDescription: '',     // User input for graph description
+      showSaveModal: false,
+      graphTitle: '',
+      graphDescription: '',
     };
   },
   methods: {
+    async importJSON() {
+  try {
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+      alert('No user information found. Please log in again.');
+      return;
+    }
+
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.json';
+    fileInput.onchange = async (event: Event) => {
+      const input = event.target as HTMLInputElement;
+      if (input.files && input.files[0]) {
+        const file = input.files[0];
+        const text = await file.text();
+        let jsonData;
+
+        try {
+          jsonData = JSON.parse(text);
+        } catch (parseError) {
+          console.error('Invalid JSON format:', parseError);
+          alert('The selected file contains invalid JSON.');
+          return;
+        }
+
+        // Check if jsonData is an array
+        if (Array.isArray(jsonData)) {
+          if (jsonData.length === 0) {
+            alert('The JSON array is empty.');
+            return;
+          }
+
+          // For simplicity, take the first graph in the array
+          jsonData = jsonData[0];
+          // Alternatively, you can implement logic to select which graph to import
+        }
+
+        // Validate JSON Structure
+        if (!jsonData.nodes || !Array.isArray(jsonData.nodes)) {
+          alert('Invalid JSON structure: "nodes" array is missing.');
+          return;
+        }
+
+        if (!jsonData.edges || !Array.isArray(jsonData.edges)) {
+          alert('Invalid JSON structure: "edges" array is missing.');
+          return;
+        }
+
+        // Map and Assign Nodes
+        this.nodes = jsonData.nodes.map((nodeData: any) => {
+          // Assign a unique ID if missing
+          const nodeId = nodeData.nodeid || uuidv4();
+
+          // Ensure required properties are present
+          return {
+            id: nodeId,
+            type: nodeData.type || 'Node',
+            x: nodeData.x || 0,
+            y: nodeData.y || 0,
+            name: nodeData.name || `q${this.stateCounter++}`,
+            isInitial: nodeData.isInitial || false,
+          };
+        });
+
+        // Check for initial state
+        this.hasInitialState = this.nodes.some(node => node.isInitial);
+
+        // Map and Assign Edges
+        this.edges = jsonData.edges.map((edgeData: any) => {
+          // Assign a unique ID if missing
+          const edgeId = uuidv4();
+
+          // Determine if it's a self-loop
+          const isSelfLoop = edgeData.isSelfLoop !== undefined
+            ? edgeData.isSelfLoop
+            : edgeData.from_nodeid === edgeData.to_nodeid;
+
+          return {
+            id: edgeId,
+            fromNodeId: edgeData.fromNodeid,
+            toNodeId: edgeData.to_nodeid,
+            x1: 0, // Will be set in updateEdges
+            y1: 0,
+            x2: 0,
+            y2: 0,
+            label: edgeData.label || '',
+            isSelfLoop: isSelfLoop,
+          };
+        });
+
+        // Update Edge Positions
+        this.updateEdges();
+
+        // Optional: Reset selectedGraphId if necessary
+        this.selectedGraphId = null;
+
+        // Notify the user
+        alert('Graph imported successfully!');
+      }
+    };
+    fileInput.click();
+  } catch (error) {
+    console.error('Error importing JSON:', error);
+    alert('An error occurred while importing the JSON file.');
+  }
+}
+,
+
     async saveGraphsAsJSON() {
       try {
         const token = localStorage.getItem('token');
@@ -187,7 +274,6 @@ export default {
           return;
         }
 
-        // Fetch the user's graphs from the backend
         const response = await fetch('/api/graphs/user', {
           method: 'GET',
           headers: {
@@ -227,11 +313,10 @@ export default {
           return;
         }
 
-        // Fetch the list of saved graphs from the backend
         const response = await fetch('/api/graphs/user', {
           method: 'GET',
           headers: {
-            'Authorization': `Bearer ${token}`, // Include the token in headers
+            'Authorization': `Bearer ${token}`,
           },
         });
 
@@ -239,7 +324,7 @@ export default {
 
         if (result.isSuccess) {
           this.savedGraphs = result.data;
-          this.showGraphModal = true; // Show the modal to select a graph
+          this.showGraphModal = true;
         } else {
           alert('Failed to load graphs.');
         }
@@ -252,13 +337,11 @@ export default {
     loadSelectedGraph() {
       const graph = this.savedGraphs.find((g) => String(g.graphid) === this.selectedGraphId);
       if (graph) {
-        // Clear current workspace
         this.nodes = [];
         this.edges = [];
         this.stateCounter = graph.nodes.length;
         this.hasInitialState = false;
 
-        // Load nodes
         graph.nodes.forEach((nodeData: any) => {
           const node: Node = {
             id: nodeData.nodeid,
@@ -274,7 +357,6 @@ export default {
           this.nodes.push(node);
         });
 
-        // Load edges
         graph.edges.forEach((edgeData: any) => {
           const edge: Edge = {
             id: uuidv4(),
@@ -290,10 +372,10 @@ export default {
           this.edges.push(edge);
         });
 
-        this.updateEdges(); // Update edge positions
+        this.updateEdges();
 
-        this.showGraphModal = false; // Close the modal
-        this.selectedGraphId = null; // Reset the selected graph ID
+        this.showGraphModal = false;
+        this.selectedGraphId = null;
       }
     },
 
@@ -320,63 +402,59 @@ export default {
     },
 
     async submitSaveGraph() {
-  try {
-    // Get the token and userid from localStorage
-    const token = localStorage.getItem('token');
-    const userid = localStorage.getItem('userid');
+      try {
+        const token = localStorage.getItem('token');
+        const userid = localStorage.getItem('userid');
 
-    // Check if token and userid exist
-    if (!token || !userid) {
-      alert('No user information found. Please log in again.');
-      return;
-    }
+        if (!token || !userid) {
+          alert('No user information found. Please log in again.');
+          return;
+        }
 
-    const graphData = {
-      name: this.graphTitle || 'Untitled Graph',
-      description: this.graphDescription || 'No description provided.',
-      nodes: this.nodes.map((node) => ({
-        nodeid: node.id,
-        x: node.x,
-        y: node.y,
-        isInitial: node.isInitial || false,
-        name: node.name,
-      })),
-      edges: this.edges.map((edge) => ({
-        from_nodeid: edge.fromNodeId,
-        to_nodeid: edge.toNodeId,
-        label: edge.label || '',
-        isSelfLoop: edge.isSelfLoop || false,
-      })),
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      version: 1,
-    };
+        const graphData = {
+          name: this.graphTitle || 'Untitled Graph',
+          description: this.graphDescription || 'No description provided.',
+          nodes: this.nodes.map((node) => ({
+            nodeid: node.id,
+            x: node.x,
+            y: node.y,
+            isInitial: node.isInitial || false,
+            name: node.name,
+          })),
+          edges: this.edges.map((edge) => ({
+            from_nodeid: edge.fromNodeId,
+            to_nodeid: edge.toNodeId,
+            label: edge.label || '',
+            isSelfLoop: edge.isSelfLoop || false,
+          })),
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          version: 1,
+        };
 
-    // Send to the backend
-    const response = await fetch('/api/graphs', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`, // Include the token in headers
-      },
-      body: JSON.stringify(graphData),
-    });
+        const response = await fetch('/api/graphs', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+          body: JSON.stringify(graphData),
+        });
 
-    const result = await response.json();
+        const result = await response.json();
 
-    if (result.isSuccess) {
-      alert('Graph saved successfully!');
-    } else {
-      alert('Failed to save graph.');
-    }
-  } catch (error) {
-    console.error('Error saving graph:', error);
-    alert('An error occurred while saving the graph.');
-  } finally {
-    // Close the modal regardless of success or failure
-    this.closeSaveModal();
-  }
-},
+        if (result.isSuccess) {
+          alert('Graph saved successfully!');
+        } else {
+          alert('Failed to save graph.');
+        }
+      } catch (error) {
+        console.error('Error saving graph:', error);
+        alert('An error occurred while saving the graph.');
+      } finally {
+        this.closeSaveModal();
+      }
+    },
 
 
     onDragStart(event: DragEvent, type: string) {
@@ -384,7 +462,6 @@ export default {
       if (!dataTransfer) return;
       dataTransfer.setData('type', type);
 
-      // Create an empty drag image
       const img = document.createElement('div');
       img.style.width = '0px';
       img.style.height = '0px';
@@ -503,7 +580,7 @@ export default {
         const fromNode = this.nodes.find((node) => node.id === edge.fromNodeId);
         const toNode = this.nodes.find((node) => node.id === edge.toNodeId);
         if (fromNode && toNode) {
-          const offset = 25; // Adjust based on node size
+          const offset = 25;
           edge.x1 = fromNode.x + offset;
           edge.y1 = fromNode.y + offset;
           edge.x2 = toNode.x + offset;

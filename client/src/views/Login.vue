@@ -17,7 +17,6 @@
       <div v-if="error" class="error-message">{{ error }}</div>
     </div>
 
-    <!-- Modal for login success -->
     <div v-if="showModal" class="modal-overlay" @click="closeModal">
       <div class="modal-content" @click.stop>
         <h2>Login Successful</h2>
@@ -41,7 +40,6 @@ export default defineComponent({
     const error = ref('');
     const showModal = ref(false);
 
-    // Inject the provided username with an explicit type
     const username = inject<Ref<string | null>>('username');
 
     const handleLogin = async () => {
@@ -61,16 +59,13 @@ export default defineComponent({
 
         const data = await response.json();
 
-        // Log the data received from the backend
         console.log('Login response data:', data);
         console.log('data.user:', data.user);
 
-        // Store the token, username, and userid in localStorage
         localStorage.setItem('token', data.token);
         localStorage.setItem('username', data.user.username);
         localStorage.setItem('userid', data.user.id);
 
-        // Update the injected username to make it reactive immediately
         if (username) username.value = data.user.username;
 
         error.value = '';
@@ -100,7 +95,6 @@ export default defineComponent({
 </script>
 
 <style scoped>
-/* Background styling */
 .login-container {
   display: flex;
   justify-content: center;
@@ -110,7 +104,6 @@ export default defineComponent({
   font-family: 'Open Sans', sans-serif;
 }
 
-/* Card styling */
 .login-card {
   max-width: 400px; /* Added to set a maximum width */
   width: 100%; /* Ensures the card takes full width up to max-width */
