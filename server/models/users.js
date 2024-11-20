@@ -39,7 +39,7 @@ async function add(user) {
 
 async function update(user) {
     const data = await dataP;
-    const index = data.items.findIndex(item => item.id == user.userid);
+    const index = data.items.findIndex(item => item.userid == user.userid);
     if (index >= 0) {
         data.items[index] = {
             ...data.items[index],
