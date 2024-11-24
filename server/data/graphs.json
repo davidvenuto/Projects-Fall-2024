@@ -1,168 +1,6 @@
 {
   "items": [
     {
-      "graphid": 0,
-      "name": "Untitled Graph",
-      "userid": 0,
-      "description": "Graph created via the workspace",
-      "created_at": "2024-11-16T19:56:39.293Z",
-      "updated_at": "2024-11-16T19:56:39.293Z",
-      "version": 1,
-      "nodes": [
-        {
-          "nodeid": "0",
-          "x": 256,
-          "y": 170.671875
-        },
-        {
-          "nodeid": "1",
-          "x": 722,
-          "y": 74.671875
-        }
-      ],
-      "edges": [
-        {
-          "from_nodeid": "0",
-          "to_nodeid": "1"
-        }
-      ]
-    },
-    {
-      "graphid": 1,
-      "name": "Untitled Graph",
-      "userid": 1,
-      "description": "Graph created via the workspace",
-      "created_at": "2024-11-16T21:28:06.127Z",
-      "updated_at": "2024-11-16T21:28:06.127Z",
-      "version": 1,
-      "nodes": [
-        {
-          "nodeid": "0",
-          "x": 324,
-          "y": 106.671875
-        },
-        {
-          "nodeid": "1",
-          "x": 610,
-          "y": 49.671875
-        }
-      ],
-      "edges": [
-        {
-          "from_nodeid": "0",
-          "to_nodeid": "1"
-        }
-      ]
-    },
-    {
-      "graphid": 2,
-      "name": "Untitled Graph",
-      "userid": 2,
-      "description": "Graph created via the workspace",
-      "created_at": "2024-11-16T21:31:10.494Z",
-      "updated_at": "2024-11-16T21:31:10.494Z",
-      "version": 1,
-      "nodes": [
-        {
-          "nodeid": "0",
-          "x": 225,
-          "y": 106.671875
-        },
-        {
-          "nodeid": "1",
-          "x": 576,
-          "y": 62.671875
-        }
-      ],
-      "edges": [
-        {
-          "from_nodeid": "0",
-          "to_nodeid": "1"
-        }
-      ]
-    },
-    {
-      "graphid": 3,
-      "name": "Untitled Graph",
-      "userid": 3,
-      "description": "Graph created via the workspace",
-      "created_at": "2024-11-16T21:34:00.739Z",
-      "updated_at": "2024-11-16T21:34:00.739Z",
-      "version": 1,
-      "nodes": [
-        {
-          "nodeid": "0",
-          "x": 334,
-          "y": 100.671875
-        },
-        {
-          "nodeid": "1",
-          "x": 702,
-          "y": 56.671875
-        }
-      ],
-      "edges": [
-        {
-          "from_nodeid": "0",
-          "to_nodeid": "1"
-        }
-      ]
-    },
-    {
-      "graphid": 4,
-      "name": "Untitled Graph",
-      "userid": 4,
-      "description": "Graph created via the workspace",
-      "created_at": "2024-11-16T22:43:52.639Z",
-      "updated_at": "2024-11-16T22:43:52.639Z",
-      "version": 1,
-      "nodes": [
-        {
-          "nodeid": "0",
-          "x": 241,
-          "y": 90.671875
-        },
-        {
-          "nodeid": "1",
-          "x": 573,
-          "y": 48.671875
-        }
-      ],
-      "edges": [
-        {
-          "from_nodeid": "0",
-          "to_nodeid": "1"
-        }
-      ]
-    },
-    {
-      "graphid": 5,
-      "name": "Untitled Graph",
-      "userid": 5,
-      "description": "Graph created via the workspace",
-      "created_at": "2024-11-16T22:46:00.123Z",
-      "updated_at": "2024-11-16T22:46:00.123Z",
-      "version": 1,
-      "nodes": [
-        {
-          "nodeid": "0",
-          "x": 300,
-          "y": 80.671875
-        },
-        {
-          "nodeid": "1",
-          "x": 600,
-          "y": 50.671875
-        }
-      ],
-      "edges": [
-        {
-          "from_nodeid": "0",
-          "to_nodeid": "1"
-        }
-      ]
-    },
-    {
       "name": "Untitled Graph",
       "description": "Graph created via the workspace",
       "nodes": [
@@ -508,6 +346,94 @@
       "graphid": 15,
       "created_at": "2024-11-20T03:36:08.571Z",
       "updated_at": "2024-11-20T03:36:08.571Z",
+      "version": 1
+    },
+    {
+      "name": "a",
+      "description": "a",
+      "nodes": [],
+      "edges": [],
+      "userid": 6,
+      "graphid": 16,
+      "created_at": "2024-11-20T15:46:55.075Z",
+      "updated_at": "2024-11-20T15:46:55.075Z",
+      "version": 1
+    },
+    {
+      "name": "a",
+      "description": "a",
+      "nodes": [],
+      "edges": [],
+      "userid": 1,
+      "graphid": 17,
+      "created_at": "2024-11-20T15:47:31.401Z",
+      "updated_at": "2024-11-20T15:47:31.401Z",
+      "version": 1
+    },
+    {
+      "name": "a",
+      "description": "a",
+      "nodes": [
+        {
+          "nodeid": "3c99d992-8e29-479b-a4f7-1be93c0a1686",
+          "x": 292,
+          "y": 169.5859375,
+          "isInitial": true,
+          "name": "q0"
+        },
+        {
+          "nodeid": "40db9e2d-470d-4e04-bda5-a5288ca2a91a",
+          "x": 837,
+          "y": 101.5859375,
+          "isInitial": false,
+          "name": "q1"
+        }
+      ],
+      "edges": [
+        {
+          "from_nodeid": "3c99d992-8e29-479b-a4f7-1be93c0a1686",
+          "to_nodeid": "40db9e2d-470d-4e04-bda5-a5288ca2a91a",
+          "label": "a",
+          "isSelfLoop": false
+        }
+      ],
+      "userid": 1,
+      "graphid": 18,
+      "created_at": "2024-11-20T15:56:50.101Z",
+      "updated_at": "2024-11-20T15:56:50.101Z",
+      "version": 1
+    },
+    {
+      "name": "David's Graph",
+      "description": "lol\n",
+      "nodes": [
+        {
+          "nodeid": "82ada464-6aae-498a-ba90-8d4fd493d2e9",
+          "x": 393,
+          "y": 109.5859375,
+          "isInitial": true,
+          "name": "q0"
+        },
+        {
+          "nodeid": "206fe0fb-e4ef-4470-a354-1ddf651f1d72",
+          "x": 829,
+          "y": 95.5859375,
+          "isInitial": false,
+          "name": "q1"
+        }
+      ],
+      "edges": [
+        {
+          "from_nodeid": "82ada464-6aae-498a-ba90-8d4fd493d2e9",
+          "to_nodeid": "206fe0fb-e4ef-4470-a354-1ddf651f1d72",
+          "label": "a",
+          "isSelfLoop": false
+        }
+      ],
+      "userid": 8,
+      "graphid": 13,
+      "created_at": "2024-11-24T22:08:05.917Z",
+      "updated_at": "2024-11-24T22:08:05.918Z",
       "version": 1
     }
   ]

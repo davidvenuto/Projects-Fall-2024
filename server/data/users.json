@@ -6,7 +6,7 @@
       "email": "johndoe@example.com",
       "username": "johndoe",
       "password": "jDoe123!",
-      "isAdmin": true
+      "isAdmin": false
     },
     {
       "userid": 1,
@@ -63,6 +63,14 @@
       "password": "lol",
       "isAdmin": false,
       "userid": 7
+    },
+    {
+      "fullname": "David Venuto",
+      "email": "djv728@verizon.net",
+      "username": "davidvenuto",
+      "password": "lol",
+      "isAdmin": false,
+      "userid": 8
     }
   ]
 }
