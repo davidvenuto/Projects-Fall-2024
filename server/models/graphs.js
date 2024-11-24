@@ -22,8 +22,12 @@ async function saveData(data) {
 
 async function getAll() {
     const data = await loadData();
-    return data.items;
+    return data.items.map(item => ({
+        ...item,
+        image: item.image || null, // Include the image field if it exists, or return null
+    }));
 }
+
 
 async function get(graphid) {
     const data = await loadData();
@@ -33,18 +37,20 @@ async function get(graphid) {
 async function add(graph) {
     const data = await loadData();
     const newGraph = {
-      ...graph,
-      graphid: data.items.length, // Generate a unique ID
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      version: 1,
-      userid: graph.userid, // Ensure userid is saved
+        ...graph,
+        graphid: data.items.length, // Generate a unique ID
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        version: 1,
+        userid: graph.userid, // Ensure userid is saved
+        image: graph.image || null, // Add the image field
     };
-  
+
     data.items.push(newGraph);
     await saveData(data);
     return newGraph;
-  }
+}
+
   
 
 async function update(graph) {
@@ -56,12 +62,14 @@ async function update(graph) {
             ...data.items[index],
             ...graph,
             updated_at: new Date().toISOString(), // Update timestamp
+            image: graph.image || data.items[index].image, // Preserve existing image if not updated
         };
         await saveData(data);
         return data.items[index];
     }
     return null;
 }
+
 
 async function remove(graphid) {
     const data = await loadData();
@@ -77,8 +85,12 @@ async function remove(graphid) {
 
 async function getAllByUserId(userid) {
     const data = await loadData();
-    return data.items.filter(item => item.userid == userid);
-  }
+    return data.items.filter(item => item.userid == userid).map(item => ({
+        ...item,
+        image: item.image || null, // Include the image field
+    }));
+}
+
   
   module.exports = {
     getAll,

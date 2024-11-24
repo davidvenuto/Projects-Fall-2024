@@ -9,6 +9,15 @@
     justify-content: center;
     align-items: center;
   }
+
+  .graph-preview-image {
+    max-width: 100%;
+    max-height: 200px;
+    margin-top: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
   
   .modal-content {
     position: relative;

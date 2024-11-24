@@ -47,23 +47,27 @@
       </div>
 
       <div v-if="showGraphModal" class="modal-overlay" @click="showGraphModal = false">
-        <div class="modal-content" @click.stop>
-          <button class="modal-close-button" @click="showGraphModal = false" aria-label="Close Modal">&times;</button>
-          <h2>Select a Graph to Load or Delete</h2>
-          <ul class="graph-list">
-            <li v-for="graph in savedGraphs" :key="graph.graphid">
-              <label>
-                <input type="radio" :value="String(graph.graphid)" v-model="selectedGraphId" />
-                {{ graph.name }} - {{ graph.description }}
-              </label>
-            </li>
-          </ul>
-          <button @click="loadSelectedGraph" :disabled="selectedGraphId === null">Load Graph</button>
-          <button @click="deleteSelectedGraph" :disabled="selectedGraphId === null" class="delete-button">Delete
-            Graph</button>
-          <button @click="showGraphModal = false">Cancel</button>
+  <div class="modal-content" @click.stop>
+    <button class="modal-close-button" @click="showGraphModal = false" aria-label="Close Modal">&times;</button>
+    <h2>Select a Graph to Load or Delete</h2>
+    <ul class="graph-list">
+      <li v-for="graph in savedGraphs" :key="graph.graphid">
+        <label>
+          <input type="radio" :value="String(graph.graphid)" v-model="selectedGraphId" />
+          {{ graph.name }} - {{ graph.description }}
+        </label>
+        <!-- Image Preview -->
+        <div v-if="selectedGraphId === String(graph.graphid)">
+          <img :src="graph.image" alt="Graph Preview" class="graph-preview-image" />
         </div>
-      </div>
+      </li>
+    </ul>
+    <button @click="loadSelectedGraph" :disabled="selectedGraphId === null">Load Graph</button>
+    <button @click="deleteSelectedGraph" :disabled="selectedGraphId === null" class="delete-button">Delete Graph</button>
+    <button @click="showGraphModal = false">Cancel</button>
+  </div>
+</div>
+
 
       <div v-if="showSaveModal" class="modal-overlay" @click="closeSaveModal">
         <div class="modal-content" @click.stop>
@@ -435,42 +439,43 @@ redoLastAction() {
     },
 
     async loadGraph() {
-      try {
-        const confirmation = confirm(
-          "Loading a saved graph will discard your current progress. Do you want to continue?"
-        );
+  try {
+    const confirmation = confirm(
+      "Loading a saved graph will discard your current progress. Do you want to continue?"
+    );
 
-        if (!confirmation) {
-          return; // Exit if the user cancels
-        }
+    if (!confirmation) {
+      return;
+    }
 
-        const token = localStorage.getItem('token');
+    const token = localStorage.getItem('token');
 
-        if (!token) {
-          alert('No user information found. Please log in again.');
-          return;
-        }
+    if (!token) {
+      alert('No user information found. Please log in again.');
+      return;
+    }
 
-        const response = await fetch('/api/graphs/user', {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
-        });
+    const response = await fetch('/api/graphs/user', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
 
-        const result = await response.json();
+    const result = await response.json();
 
-        if (result.isSuccess) {
-          this.savedGraphs = result.data;
-          this.showGraphModal = true;
-        } else {
-          alert('Failed to load graphs.');
-        }
-      } catch (error) {
-        console.error('Error loading graphs:', error);
-        alert('An error occurred while loading graphs.');
-      }
-    },
+    if (result.isSuccess) {
+      this.savedGraphs = result.data;
+      this.showGraphModal = true;
+    } else {
+      alert('Failed to load graphs.');
+    }
+  } catch (error) {
+    console.error('Error loading graphs:', error);
+    alert('An error occurred while loading graphs.');
+  }
+},
+
 
     loadSelectedGraph() {
       const graph = this.savedGraphs.find((g) => String(g.graphid) === this.selectedGraphId);
@@ -546,60 +551,70 @@ redoLastAction() {
     },
 
     async submitSaveGraph() {
-      try {
-        const token = localStorage.getItem('token');
-        const userid = localStorage.getItem('userid');
+  try {
+    const token = localStorage.getItem('token');
+    const userid = localStorage.getItem('userid');
 
-        if (!token || !userid) {
-          alert('No user information found. Please log in again.');
-          return;
-        }
+    if (!token || !userid) {
+      alert('No user information found. Please log in again.');
+      return;
+    }
 
-        const graphData = {
-          name: this.graphTitle || 'Untitled Graph',
-          description: this.graphDescription || 'No description provided.',
-          nodes: this.nodes.map((node) => ({
-            nodeid: node.id,
-            x: node.x,
-            y: node.y,
-            isInitial: node.isInitial || false,
-            name: node.name,
-          })),
-          edges: this.edges.map((edge) => ({
-            from_nodeid: edge.fromNodeId,
-            to_nodeid: edge.toNodeId,
-            label: edge.label || '',
-            isSelfLoop: edge.isSelfLoop || false,
-          })),
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          version: 1,
-        };
+    // Capture the workspace image
+    const workspace = this.$refs.workspace as HTMLElement;
+    if (!workspace) {
+      alert('Workspace not found.');
+      return;
+    }
 
-        const response = await fetch('/api/graphs', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
-          },
-          body: JSON.stringify(graphData),
-        });
+    const canvas = await html2canvas(workspace);
+    const imageDataUrl = canvas.toDataURL('image/png');
 
-        const result = await response.json();
+    const graphData = {
+      name: this.graphTitle || 'Untitled Graph',
+      description: this.graphDescription || 'No description provided.',
+      nodes: this.nodes.map((node) => ({
+        nodeid: node.id,
+        x: node.x,
+        y: node.y,
+        isInitial: node.isInitial || false,
+        name: node.name,
+      })),
+      edges: this.edges.map((edge) => ({
+        from_nodeid: edge.fromNodeId,
+        to_nodeid: edge.toNodeId,
+        label: edge.label || '',
+        isSelfLoop: edge.isSelfLoop || false,
+      })),
+      image: imageDataUrl, // Include the image data URL
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      version: 1,
+    };
 
-        if (result.isSuccess) {
-          alert('Graph saved successfully!');
-        } else {
-          alert('Failed to save graph.');
-        }
-      } catch (error) {
-        console.error('Error saving graph:', error);
-        alert('An error occurred while saving the graph.');
-      } finally {
-        this.closeSaveModal();
-      }
-    },
+    const response = await fetch('/api/graphs', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(graphData),
+    });
 
+    const result = await response.json();
+
+    if (result.isSuccess) {
+      alert('Graph saved successfully!');
+    } else {
+      alert('Failed to save graph.');
+    }
+  } catch (error) {
+    console.error('Error saving graph:', error);
+    alert('An error occurred while saving the graph.');
+  } finally {
+    this.closeSaveModal();
+  }
+},
 
     onDragStart(event: DragEvent, type: string) {
       const dataTransfer = event.dataTransfer;
