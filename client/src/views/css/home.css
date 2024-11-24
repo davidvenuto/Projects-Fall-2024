@@ -11,6 +11,7 @@
   }
   
   .modal-content {
+    position: relative;
     background-color: #fff;
     padding: 30px 40px;
     border-radius: 8px;
@@ -20,6 +21,21 @@
   
   .modal-content h2 {
     margin-bottom: 20px;
+    color: #333;
+  }
+
+  .modal-close-button {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: transparent;
+    border: none;
+    font-size: 24px;
+    color: #aaa;
+    cursor: pointer;
+  }
+  
+  .modal-close-button:hover {
     color: #333;
   }
   
@@ -67,7 +83,7 @@
   .modal-content button {
     margin-right: 10px;
     padding: 10px 15px;
-    background-color: #42b983;
+    background-color: #004aeb;
     color: #ffffff;
     border: none;
     border-radius: 5px;
@@ -84,7 +100,7 @@
   }
   
   .modal-content button:hover {
-    background-color: #369f75;
+    background-color: #0044ff;
   }
   
   .modal-content button[disabled] {
@@ -127,7 +143,7 @@
   .workspace-header button {
     margin-right: 10px;
     padding: 10px 15px;
-    background-color: #1db3ee;
+    background-color: #007bff; /* Blue */
     color: #ffffff;
     border: none;
     border-radius: 5px;
@@ -137,9 +153,13 @@
   }
   
   .workspace-header button:hover {
-    background-color: #117efa;
+    background-color: #0056b3; /* Darker blue */
   }
   
+  .workspace-header button[disabled] {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
   .workspace {
     flex: 1;
     background-color: #f9fafc;
@@ -315,5 +335,26 @@
     .toolbox {
       order: -1;
     }
+
+  }
+
+  .modal-content .delete-button {
+    background-color: #ff4d4f; 
+    color: white; 
+    padding: 10px 15px;
+    margin-left: 10px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+  }
+  
+  .modal-content .delete-button:hover {
+    background-color: #d9363e; 
+  }
+  
+  .modal-content .delete-button:disabled {
+    background-color: #ffa39e; 
+    cursor: not-allowed;
   }
   

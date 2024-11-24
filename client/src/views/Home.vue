@@ -6,9 +6,11 @@
         <p>Drop items here</p>
         <button @click="openSaveModal">Save Graph</button>
         <button @click="saveAsImage">Save Graph as Image</button>
-        <button @click="loadGraph">Load Saved Graph</button>
-        <button @click="saveGraphsAsJSON">Save Graphs Data</button>
-        <button @click="importJSON">Import JSON File</button>
+        <button @click="loadGraph">Manage Graphs</button>
+        <button @click="saveGraphsAsJSON">Export Graph</button>
+        <button @click="importJSON">Import Graph (JSON)</button>
+        <button @click="undoLastAction" :disabled="actionHistory.length === 0">Undo</button>
+        <button @click="redoLastAction" :disabled="redoStack.length === 0">Redo</button>
       </div>
 
       <div class="workspace" ref="workspace" @dragover.prevent="onDragOver" @drop="onDrop">
@@ -46,7 +48,8 @@
 
       <div v-if="showGraphModal" class="modal-overlay" @click="showGraphModal = false">
         <div class="modal-content" @click.stop>
-          <h2>Select a Graph to Load</h2>
+          <button class="modal-close-button" @click="showGraphModal = false" aria-label="Close Modal">&times;</button>
+          <h2>Select a Graph to Load or Delete</h2>
           <ul class="graph-list">
             <li v-for="graph in savedGraphs" :key="graph.graphid">
               <label>
@@ -56,6 +59,8 @@
             </li>
           </ul>
           <button @click="loadSelectedGraph" :disabled="selectedGraphId === null">Load Graph</button>
+          <button @click="deleteSelectedGraph" :disabled="selectedGraphId === null" class="delete-button">Delete
+            Graph</button>
           <button @click="showGraphModal = false">Cancel</button>
         </div>
       </div>
@@ -152,9 +157,134 @@ export default {
       showSaveModal: false,
       graphTitle: '',
       graphDescription: '',
+      actionHistory: [] as any[], 
+      redoStack: [] as any[], 
     };
   },
   methods: {
+    undoLastAction() {
+  const lastAction = this.actionHistory.pop();
+  if (!lastAction) {
+    alert('Nothing to undo.');
+    return;
+  }
+
+  // Move the undone action to the redo stack
+  this.redoStack.push(lastAction);
+
+  switch (lastAction.type) {
+    case 'add_node':
+      const nodeIndex = this.nodes.findIndex(node => node.id === lastAction.node.id);
+      if (nodeIndex !== -1) {
+        if (this.nodes[nodeIndex].isInitial) {
+          this.hasInitialState = false;
+        }
+        this.nodes.splice(nodeIndex, 1);
+        this.stateCounter--;
+        this.edges = this.edges.filter(
+          edge => edge.fromNodeId !== lastAction.node.id && edge.toNodeId !== lastAction.node.id
+        );
+      }
+      break;
+
+    case 'add_edge':
+      const edgeIndex = this.edges.findIndex(edge => edge.id === lastAction.edge.id);
+      if (edgeIndex !== -1) {
+        this.edges.splice(edgeIndex, 1);
+      }
+      break;
+
+    case 'move_node':
+      this.nodes[lastAction.nodeIndex].x = lastAction.previousPosition.x;
+      this.nodes[lastAction.nodeIndex].y = lastAction.previousPosition.y;
+      this.updateEdges();
+      break;
+
+    default:
+      break;
+  }
+},
+
+redoLastAction() {
+  const lastUndone = this.redoStack.pop();
+  if (!lastUndone) {
+    alert('Nothing to redo.');
+    return;
+  }
+
+  // Move the redone action back to the action history
+  this.actionHistory.push(lastUndone);
+
+  switch (lastUndone.type) {
+    case 'add_node':
+      this.nodes.push(lastUndone.node);
+      if (lastUndone.node.isInitial) {
+        this.hasInitialState = true;
+      }
+      break;
+
+    case 'add_edge':
+      this.edges.push(lastUndone.edge);
+      break;
+
+    case 'move_node':
+      this.nodes[lastUndone.nodeIndex].x = lastUndone.newPosition.x;
+      this.nodes[lastUndone.nodeIndex].y = lastUndone.newPosition.y;
+      this.updateEdges();
+      break;
+
+    default:
+      break;
+  }
+},
+
+
+
+    async deleteSelectedGraph() {
+      if (!this.selectedGraphId) {
+        alert('Please select a graph to delete.');
+        return;
+      }
+
+      const confirmDeletion = confirm('Are you sure you want to delete the selected graph? This action cannot be undone.');
+      if (!confirmDeletion) {
+        return;
+      }
+
+      try {
+        const token = localStorage.getItem('token');
+
+        if (!token) {
+          alert('No user information found. Please log in again.');
+          return;
+        }
+
+        const response = await fetch(`/api/graphs/${this.selectedGraphId}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+
+        const result = await response.json();
+
+        if (result.isSuccess) {
+          alert('Graph deleted successfully!');
+
+          // Remove the deleted graph from the savedGraphs array
+          this.savedGraphs = this.savedGraphs.filter(graph => String(graph.graphid) !== this.selectedGraphId);
+          this.selectedGraphId = null;
+
+        } else {
+          alert('Failed to delete the graph.');
+        }
+
+      } catch (error) {
+        console.error('Error deleting graph:', error);
+        alert('An error occurred while deleting the graph.');
+      }
+    },
+
     async importJSON() {
       try {
         const token = localStorage.getItem('token');
@@ -391,13 +521,19 @@ export default {
       const workspace = this.$refs.workspace as HTMLElement;
       if (!workspace) return;
 
+      // Prompt the user for a filename
+      const filename = prompt("Enter a filename for your image:", "workspace.png");
+      if (!filename) return; // Exit if the user cancels or doesn't enter a filename
+
       html2canvas(workspace).then((canvas) => {
         const link = document.createElement('a');
-        link.download = 'workspace.png';
+        // Ensure the filename ends with .png
+        link.download = filename.toLowerCase().endsWith('.png') ? filename : `${filename}.png`;
         link.href = canvas.toDataURL('image/png');
         link.click();
       });
     },
+
 
     openSaveModal() {
       this.showSaveModal = true;
@@ -489,99 +625,136 @@ export default {
     },
 
     onDrop(event: DragEvent) {
-      event.preventDefault();
-      const dataTransfer = event.dataTransfer;
-      if (!dataTransfer) return;
+  event.preventDefault();
+  this.redoStack = [];
+  const dataTransfer = event.dataTransfer;
+  if (!dataTransfer) return;
 
-      const workspaceRect = (event.currentTarget as HTMLElement).getBoundingClientRect();
-      const x = event.clientX - workspaceRect.left;
-      const y = event.clientY - workspaceRect.top;
+  const workspaceRect = (event.currentTarget as HTMLElement).getBoundingClientRect();
+  const x = event.clientX - workspaceRect.left;
+  const y = event.clientY - workspaceRect.top;
 
-      const movingItemIndex = dataTransfer.getData('movingItemIndex');
-      const itemType = dataTransfer.getData('type');
+  const movingItemIndex = dataTransfer.getData('movingItemIndex');
+  const itemType = dataTransfer.getData('type');
 
-      if (movingItemIndex) {
-        const index = parseInt(movingItemIndex);
-        if (!isNaN(index) && this.nodes[index]) {
-          this.nodes[index].x = x;
-          this.nodes[index].y = y;
-          this.updateEdges();
-        }
-        return;
+  if (movingItemIndex) {
+    const index = parseInt(movingItemIndex);
+    if (!isNaN(index) && this.nodes[index]) {
+      const previousPosition = { x: this.nodes[index].x, y: this.nodes[index].y };
+      this.nodes[index].x = x;
+      this.nodes[index].y = y;
+      this.updateEdges();
+
+      // Record the move action
+      this.actionHistory.push({
+        type: 'move_node',
+        nodeIndex: index,
+        previousPosition,
+      });
+    }
+    return;
+  }
+
+  if (!this.hasInitialState && itemType !== 'InitialNode') {
+    alert('Please place an initial state first.');
+    return;
+  }
+
+  switch (itemType) {
+    case 'InitialNode':
+      if (!this.hasInitialState) {
+        const newNode = {
+          id: uuidv4(),
+          type: 'Node',
+          x,
+          y,
+          name: `q${this.stateCounter++}`,
+          isInitial: true,
+        };
+        this.nodes.push(newNode);
+        this.hasInitialState = true;
+
+        // Record the add node action
+        this.actionHistory.push({
+          type: 'add_node',
+          node: newNode,
+        });
       }
+      break;
 
-      if (!this.hasInitialState && itemType !== 'InitialNode') {
-        alert('Please place an initial state first.');
-        return;
+    case 'Node':
+      const newNode = {
+        id: uuidv4(),
+        type: itemType,
+        x,
+        y,
+        name: `q${this.stateCounter++}`,
+        isInitial: false,
+      };
+      this.nodes.push(newNode);
+
+      // Record the add node action
+      this.actionHistory.push({
+        type: 'add_node',
+        node: newNode,
+      });
+      break;
+
+    case 'Edge':
+      if (this.nodes.length >= 2) {
+        const fromNode = this.nodes[this.nodes.length - 2];
+        const toNode = this.nodes[this.nodes.length - 1];
+        const label = prompt("Enter label for this edge (e.g., 'a' for q0 to q1 transition):", '') || '';
+
+        const newEdge = {
+          id: uuidv4(),
+          fromNodeId: fromNode.id,
+          toNodeId: toNode.id,
+          x1: fromNode.x + 20,
+          y1: fromNode.y + 20,
+          x2: toNode.x + 20,
+          y2: toNode.y + 20,
+          label,
+        };
+        this.edges.push(newEdge);
+
+        // Record the add edge action
+        this.actionHistory.push({
+          type: 'add_edge',
+          edge: newEdge,
+        });
       }
+      break;
 
-      switch (itemType) {
-        case 'InitialNode':
-          if (!this.hasInitialState) {
-            this.nodes.push({
-              id: uuidv4(),
-              type: 'Node',
-              x,
-              y,
-              name: `q${this.stateCounter++}`,
-              isInitial: true,
-            });
-            this.hasInitialState = true;
-          }
-          break;
+    case 'SelfLoop':
+      const targetNode = this.nodes[this.nodes.length - 1];
+      if (targetNode) {
+        const label = prompt("Enter label for this self-loop (e.g., 'a'):", '') || '';
+        const newEdge = {
+          id: uuidv4(),
+          fromNodeId: targetNode.id,
+          toNodeId: targetNode.id,
+          x1: targetNode.x,
+          y1: targetNode.y,
+          x2: targetNode.x,
+          y2: targetNode.y,
+          label,
+          isSelfLoop: true,
+        };
+        this.edges.push(newEdge);
 
-        case 'Node':
-          this.nodes.push({
-            id: uuidv4(),
-            type: itemType,
-            x,
-            y,
-            name: `q${this.stateCounter++}`,
-            isInitial: false,
-          });
-          break;
-
-        case 'Edge':
-          if (this.nodes.length >= 2) {
-            const fromNode = this.nodes[this.nodes.length - 2];
-            const toNode = this.nodes[this.nodes.length - 1];
-            const label = prompt("Enter label for this edge (e.g., 'a' for q0 to q1 transition):", '') || '';
-
-            this.edges.push({
-              id: uuidv4(),
-              fromNodeId: fromNode.id,
-              toNodeId: toNode.id,
-              x1: fromNode.x + 20,
-              y1: fromNode.y + 20,
-              x2: toNode.x + 20,
-              y2: toNode.y + 20,
-              label,
-            });
-          }
-          break;
-
-        case 'SelfLoop':
-          const targetNode = this.nodes[this.nodes.length - 1];
-          if (targetNode) {
-            const label = prompt("Enter label for this self-loop (e.g., 'a'):", '') || '';
-            this.edges.push({
-              id: uuidv4(),
-              fromNodeId: targetNode.id,
-              toNodeId: targetNode.id,
-              x1: targetNode.x,
-              y1: targetNode.y,
-              x2: targetNode.x,
-              y2: targetNode.y,
-              label,
-              isSelfLoop: true,
-            });
-          }
-          break;
-
-        default:
-          break;
+        // Record the add edge action
+        this.actionHistory.push({
+          type: 'add_edge',
+          edge: newEdge,
+        });
       }
-    },
+      break;
+
+    default:
+      break;
+  }
+},
 
     updateEdges() {
       this.edges.forEach((edge) => {
@@ -600,4 +773,4 @@ export default {
 };
 </script>
 
-<style scoped src="./css/home.css"></style>
+<style src="./css/home.css"></style>

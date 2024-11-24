@@ -71,6 +71,14 @@
       "password": "lol",
       "isAdmin": false,
       "userid": 8
+    },
+    {
+      "fullname": "newuser",
+      "email": "davidven@gmail.com",
+      "username": "lol",
+      "password": "lol",
+      "isAdmin": false,
+      "userid": 9
     }
   ]
 }

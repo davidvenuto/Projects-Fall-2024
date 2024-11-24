@@ -2,6 +2,7 @@
   <div class="register-container">
     <h1>Register</h1>
     <form @submit.prevent="register" class="register-form">
+      <!-- Form Fields -->
       <div class="form-group">
         <label for="fullname">Full Name</label>
         <input v-model="user.fullname" id="fullname" placeholder="Enter your full name" required />
@@ -20,6 +21,8 @@
       </div>
       <button type="submit" class="register-button">Register</button>
     </form>
+    <!-- Success Message -->
+    <div v-if="message" class="success-message">{{ message }}</div>
   </div>
 </template>
 
@@ -34,7 +37,8 @@ export default {
         username: '',
         password: '',
         isAdmin: false
-      }
+      },
+      message: '' // Add message variable
     };
   },
   methods: {
@@ -52,6 +56,15 @@ export default {
         }
         const data = await response.json();
         console.log('User registered:', data);
+
+        // Set the success message
+        this.message = 'Successfully registered! You will now be redirected to the log in page';
+
+        // Redirect to login page after a short delay
+        setTimeout(() => {
+          this.$router.push('/login');
+        }, 2000); // Delay for 2 seconds
+
       } catch (error) {
         console.error('Error registering user:', error);
       }
