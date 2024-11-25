@@ -79,6 +79,14 @@
       "password": "lol",
       "isAdmin": false,
       "userid": 9
+    },
+    {
+      "fullname": "TestUser",
+      "email": "testuser@gmail.com",
+      "username": "test_user",
+      "password": "abc123",
+      "isAdmin": false,
+      "userid": 10
     }
   ]
 }

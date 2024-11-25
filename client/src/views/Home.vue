@@ -2,16 +2,25 @@
   <div class="container">
     <div class="left-side">
       <div class="workspace-header">
-        <h2 class="workspace-title">Workspace</h2>
-        <p>Drop items here</p>
-        <button @click="openSaveModal">Save Graph</button>
-        <button @click="saveAsImage">Save Graph as Image</button>
-        <button @click="loadGraph">Manage Graphs</button>
-        <button @click="saveGraphsAsJSON">Export Graph</button>
-        <button @click="importJSON">Import Graph (JSON)</button>
-        <button @click="undoLastAction" :disabled="actionHistory.length === 0">Undo</button>
-        <button @click="redoLastAction" :disabled="redoStack.length === 0">Redo</button>
-      </div>
+  <h2 class="workspace-title">Workspace</h2>
+  <p>Drop items here</p>
+
+  <!-- File Operations Group -->
+  <div class="button-group file-operations">
+    <button @click="openSaveModal">Save Graph</button>
+    <button @click="saveAsImage">Save as Image</button>
+    <button @click="loadGraph">Manage Graphs</button>
+    <button @click="saveGraphsAsJSON">Export Graph</button>
+    <button @click="importJSON">Import Graph</button>
+    <button @click="clearWorkspace">Clear Workspace</button>
+  </div>
+
+  <!-- Edit Operations Group -->
+  <div class="button-group edit-operations">
+    <button @click="undoLastAction" :disabled="actionHistory.length === 0">Undo</button>
+    <button @click="redoLastAction" :disabled="redoStack.length === 0">Redo</button>
+  </div>
+</div>
 
       <div class="workspace" ref="workspace" @dragover.prevent="onDragOver" @drop="onDrop">
         <svg class="edges-layer" style="position: absolute; width: 100%; height: 100%; top: 0; left: 0;">
@@ -47,26 +56,27 @@
       </div>
 
       <div v-if="showGraphModal" class="modal-overlay" @click="showGraphModal = false">
-  <div class="modal-content" @click.stop>
-    <button class="modal-close-button" @click="showGraphModal = false" aria-label="Close Modal">&times;</button>
-    <h2>Select a Graph to Load or Delete</h2>
-    <ul class="graph-list">
-      <li v-for="graph in savedGraphs" :key="graph.graphid">
-        <label>
-          <input type="radio" :value="String(graph.graphid)" v-model="selectedGraphId" />
-          {{ graph.name }} - {{ graph.description }}
-        </label>
-        <!-- Image Preview -->
-        <div v-if="selectedGraphId === String(graph.graphid)">
-          <img :src="graph.image" alt="Graph Preview" class="graph-preview-image" />
+        <div class="modal-content" @click.stop>
+          <button class="modal-close-button" @click="showGraphModal = false" aria-label="Close Modal">&times;</button>
+          <h2>Select a Graph to Load or Delete</h2>
+          <ul class="graph-list">
+            <li v-for="graph in savedGraphs" :key="graph.graphid">
+              <label>
+                <input type="radio" :value="String(graph.graphid)" v-model="selectedGraphId" />
+                {{ graph.name }} - {{ graph.description }}
+              </label>
+              <!-- Image Preview -->
+              <div v-if="selectedGraphId === String(graph.graphid)">
+                <img :src="graph.image" alt="Graph Preview" class="graph-preview-image" />
+              </div>
+            </li>
+          </ul>
+          <button @click="loadSelectedGraph" :disabled="selectedGraphId === null">Load Graph</button>
+          <button @click="deleteSelectedGraph" :disabled="selectedGraphId === null" class="delete-button">Delete
+            Graph</button>
+          <button @click="showGraphModal = false">Cancel</button>
         </div>
-      </li>
-    </ul>
-    <button @click="loadSelectedGraph" :disabled="selectedGraphId === null">Load Graph</button>
-    <button @click="deleteSelectedGraph" :disabled="selectedGraphId === null" class="delete-button">Delete Graph</button>
-    <button @click="showGraphModal = false">Cancel</button>
-  </div>
-</div>
+      </div>
 
 
       <div v-if="showSaveModal" class="modal-overlay" @click="closeSaveModal">
@@ -161,86 +171,99 @@ export default {
       showSaveModal: false,
       graphTitle: '',
       graphDescription: '',
-      actionHistory: [] as any[], 
-      redoStack: [] as any[], 
+      actionHistory: [] as any[],
+      redoStack: [] as any[],
     };
   },
   methods: {
+    clearWorkspace() {
+      const confirmation = confirm(
+        'Are you sure you want to clear the workspace? This action cannot be undone and you will lose your current progress.'
+      );
+      if (confirmation) {
+        this.nodes = [];
+        this.edges = [];
+        this.actionHistory = [];
+        this.redoStack = [];
+        this.hasInitialState = false;
+        this.stateCounter = 0;
+      }
+    },
+
     undoLastAction() {
-  const lastAction = this.actionHistory.pop();
-  if (!lastAction) {
-    alert('Nothing to undo.');
-    return;
-  }
-
-  // Move the undone action to the redo stack
-  this.redoStack.push(lastAction);
-
-  switch (lastAction.type) {
-    case 'add_node':
-      const nodeIndex = this.nodes.findIndex(node => node.id === lastAction.node.id);
-      if (nodeIndex !== -1) {
-        if (this.nodes[nodeIndex].isInitial) {
-          this.hasInitialState = false;
-        }
-        this.nodes.splice(nodeIndex, 1);
-        this.stateCounter--;
-        this.edges = this.edges.filter(
-          edge => edge.fromNodeId !== lastAction.node.id && edge.toNodeId !== lastAction.node.id
-        );
+      const lastAction = this.actionHistory.pop();
+      if (!lastAction) {
+        alert('Nothing to undo.');
+        return;
       }
-      break;
 
-    case 'add_edge':
-      const edgeIndex = this.edges.findIndex(edge => edge.id === lastAction.edge.id);
-      if (edgeIndex !== -1) {
-        this.edges.splice(edgeIndex, 1);
+      this.redoStack.push(lastAction);
+
+      switch (lastAction.type) {
+        case 'add_node':
+          const nodeIndex = this.nodes.findIndex(node => node.id === lastAction.node.id);
+          if (nodeIndex !== -1) {
+            if (this.nodes[nodeIndex].isInitial) {
+              this.hasInitialState = false;
+            }
+            this.nodes.splice(nodeIndex, 1);
+            this.stateCounter--;
+            this.edges = this.edges.filter(
+              edge => edge.fromNodeId !== lastAction.node.id && edge.toNodeId !== lastAction.node.id
+            );
+          }
+          break;
+
+        case 'add_edge':
+          const edgeIndex = this.edges.findIndex(edge => edge.id === lastAction.edge.id);
+          if (edgeIndex !== -1) {
+            this.edges.splice(edgeIndex, 1);
+          }
+          break;
+
+        case 'move_node':
+          this.nodes[lastAction.nodeIndex].x = lastAction.previousPosition.x;
+          this.nodes[lastAction.nodeIndex].y = lastAction.previousPosition.y;
+          this.updateEdges();
+          break;
+
+        default:
+          break;
       }
-      break;
+    },
 
-    case 'move_node':
-      this.nodes[lastAction.nodeIndex].x = lastAction.previousPosition.x;
-      this.nodes[lastAction.nodeIndex].y = lastAction.previousPosition.y;
-      this.updateEdges();
-      break;
-
-    default:
-      break;
-  }
-},
-
-redoLastAction() {
-  const lastUndone = this.redoStack.pop();
-  if (!lastUndone) {
-    alert('Nothing to redo.');
-    return;
-  }
-
-  // Move the redone action back to the action history
-  this.actionHistory.push(lastUndone);
-
-  switch (lastUndone.type) {
-    case 'add_node':
-      this.nodes.push(lastUndone.node);
-      if (lastUndone.node.isInitial) {
-        this.hasInitialState = true;
+    redoLastAction() {
+      const lastUndone = this.redoStack.pop();
+      if (!lastUndone) {
+        alert('Nothing to redo.');
+        return;
       }
-      break;
 
-    case 'add_edge':
-      this.edges.push(lastUndone.edge);
-      break;
+      // Move the redone action back to the action history
+      this.actionHistory.push(lastUndone);
 
-    case 'move_node':
-      this.nodes[lastUndone.nodeIndex].x = lastUndone.newPosition.x;
-      this.nodes[lastUndone.nodeIndex].y = lastUndone.newPosition.y;
-      this.updateEdges();
-      break;
+      switch (lastUndone.type) {
+        case 'add_node':
+          this.nodes.push(lastUndone.node);
+          if (lastUndone.node.isInitial) {
+            this.hasInitialState = true;
+          }
+          break;
 
-    default:
-      break;
-  }
-},
+        case 'add_edge':
+          this.edges.push(lastUndone.edge);
+          break;
+
+        case 'move_node':
+          this.nodes[lastUndone.nodeIndex].x = lastUndone.newPosition.x;
+          this.nodes[lastUndone.nodeIndex].y = lastUndone.newPosition.y;
+          this.updateEdges();
+          break;
+
+        default:
+          break;
+      }
+    },
 
 
 
@@ -439,42 +462,42 @@ redoLastAction() {
     },
 
     async loadGraph() {
-  try {
-    const confirmation = confirm(
-      "Loading a saved graph will discard your current progress. Do you want to continue?"
-    );
+      try {
+        const confirmation = confirm(
+          "Loading a saved graph will discard your current progress. Do you want to continue?"
+        );
 
-    if (!confirmation) {
-      return;
-    }
+        if (!confirmation) {
+          return;
+        }
 
-    const token = localStorage.getItem('token');
+        const token = localStorage.getItem('token');
 
-    if (!token) {
-      alert('No user information found. Please log in again.');
-      return;
-    }
+        if (!token) {
+          alert('No user information found. Please log in again.');
+          return;
+        }
 
-    const response = await fetch('/api/graphs/user', {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
-    });
+        const response = await fetch('/api/graphs/user', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
 
-    const result = await response.json();
+        const result = await response.json();
 
-    if (result.isSuccess) {
-      this.savedGraphs = result.data;
-      this.showGraphModal = true;
-    } else {
-      alert('Failed to load graphs.');
-    }
-  } catch (error) {
-    console.error('Error loading graphs:', error);
-    alert('An error occurred while loading graphs.');
-  }
-},
+        if (result.isSuccess) {
+          this.savedGraphs = result.data;
+          this.showGraphModal = true;
+        } else {
+          alert('Failed to load graphs.');
+        }
+      } catch (error) {
+        console.error('Error loading graphs:', error);
+        alert('An error occurred while loading graphs.');
+      }
+    },
 
 
     loadSelectedGraph() {
@@ -551,70 +574,70 @@ redoLastAction() {
     },
 
     async submitSaveGraph() {
-  try {
-    const token = localStorage.getItem('token');
-    const userid = localStorage.getItem('userid');
+      try {
+        const token = localStorage.getItem('token');
+        const userid = localStorage.getItem('userid');
 
-    if (!token || !userid) {
-      alert('No user information found. Please log in again.');
-      return;
-    }
+        if (!token || !userid) {
+          alert('No user information found. Please log in again.');
+          return;
+        }
 
-    // Capture the workspace image
-    const workspace = this.$refs.workspace as HTMLElement;
-    if (!workspace) {
-      alert('Workspace not found.');
-      return;
-    }
+        // Capture the workspace image
+        const workspace = this.$refs.workspace as HTMLElement;
+        if (!workspace) {
+          alert('Workspace not found.');
+          return;
+        }
 
-    const canvas = await html2canvas(workspace);
-    const imageDataUrl = canvas.toDataURL('image/png');
+        const canvas = await html2canvas(workspace);
+        const imageDataUrl = canvas.toDataURL('image/png');
 
-    const graphData = {
-      name: this.graphTitle || 'Untitled Graph',
-      description: this.graphDescription || 'No description provided.',
-      nodes: this.nodes.map((node) => ({
-        nodeid: node.id,
-        x: node.x,
-        y: node.y,
-        isInitial: node.isInitial || false,
-        name: node.name,
-      })),
-      edges: this.edges.map((edge) => ({
-        from_nodeid: edge.fromNodeId,
-        to_nodeid: edge.toNodeId,
-        label: edge.label || '',
-        isSelfLoop: edge.isSelfLoop || false,
-      })),
-      image: imageDataUrl, // Include the image data URL
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      version: 1,
-    };
+        const graphData = {
+          name: this.graphTitle || 'Untitled Graph',
+          description: this.graphDescription || 'No description provided.',
+          nodes: this.nodes.map((node) => ({
+            nodeid: node.id,
+            x: node.x,
+            y: node.y,
+            isInitial: node.isInitial || false,
+            name: node.name,
+          })),
+          edges: this.edges.map((edge) => ({
+            from_nodeid: edge.fromNodeId,
+            to_nodeid: edge.toNodeId,
+            label: edge.label || '',
+            isSelfLoop: edge.isSelfLoop || false,
+          })),
+          image: imageDataUrl, // Include the image data URL
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          version: 1,
+        };
 
-    const response = await fetch('/api/graphs', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-      body: JSON.stringify(graphData),
-    });
+        const response = await fetch('/api/graphs', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+          body: JSON.stringify(graphData),
+        });
 
-    const result = await response.json();
+        const result = await response.json();
 
-    if (result.isSuccess) {
-      alert('Graph saved successfully!');
-    } else {
-      alert('Failed to save graph.');
-    }
-  } catch (error) {
-    console.error('Error saving graph:', error);
-    alert('An error occurred while saving the graph.');
-  } finally {
-    this.closeSaveModal();
-  }
-},
+        if (result.isSuccess) {
+          alert('Graph saved successfully!');
+        } else {
+          alert('Failed to save graph.');
+        }
+      } catch (error) {
+        console.error('Error saving graph:', error);
+        alert('An error occurred while saving the graph.');
+      } finally {
+        this.closeSaveModal();
+      }
+    },
 
     onDragStart(event: DragEvent, type: string) {
       const dataTransfer = event.dataTransfer;
@@ -640,136 +663,136 @@ redoLastAction() {
     },
 
     onDrop(event: DragEvent) {
-  event.preventDefault();
-  this.redoStack = [];
-  const dataTransfer = event.dataTransfer;
-  if (!dataTransfer) return;
+      event.preventDefault();
+      this.redoStack = [];
+      const dataTransfer = event.dataTransfer;
+      if (!dataTransfer) return;
 
-  const workspaceRect = (event.currentTarget as HTMLElement).getBoundingClientRect();
-  const x = event.clientX - workspaceRect.left;
-  const y = event.clientY - workspaceRect.top;
+      const workspaceRect = (event.currentTarget as HTMLElement).getBoundingClientRect();
+      const x = event.clientX - workspaceRect.left;
+      const y = event.clientY - workspaceRect.top;
 
-  const movingItemIndex = dataTransfer.getData('movingItemIndex');
-  const itemType = dataTransfer.getData('type');
+      const movingItemIndex = dataTransfer.getData('movingItemIndex');
+      const itemType = dataTransfer.getData('type');
 
-  if (movingItemIndex) {
-    const index = parseInt(movingItemIndex);
-    if (!isNaN(index) && this.nodes[index]) {
-      const previousPosition = { x: this.nodes[index].x, y: this.nodes[index].y };
-      this.nodes[index].x = x;
-      this.nodes[index].y = y;
-      this.updateEdges();
+      if (movingItemIndex) {
+        const index = parseInt(movingItemIndex);
+        if (!isNaN(index) && this.nodes[index]) {
+          const previousPosition = { x: this.nodes[index].x, y: this.nodes[index].y };
+          this.nodes[index].x = x;
+          this.nodes[index].y = y;
+          this.updateEdges();
 
-      // Record the move action
-      this.actionHistory.push({
-        type: 'move_node',
-        nodeIndex: index,
-        previousPosition,
-      });
-    }
-    return;
-  }
-
-  if (!this.hasInitialState && itemType !== 'InitialNode') {
-    alert('Please place an initial state first.');
-    return;
-  }
-
-  switch (itemType) {
-    case 'InitialNode':
-      if (!this.hasInitialState) {
-        const newNode = {
-          id: uuidv4(),
-          type: 'Node',
-          x,
-          y,
-          name: `q${this.stateCounter++}`,
-          isInitial: true,
-        };
-        this.nodes.push(newNode);
-        this.hasInitialState = true;
-
-        // Record the add node action
-        this.actionHistory.push({
-          type: 'add_node',
-          node: newNode,
-        });
+          // Record the move action
+          this.actionHistory.push({
+            type: 'move_node',
+            nodeIndex: index,
+            previousPosition,
+          });
+        }
+        return;
       }
-      break;
 
-    case 'Node':
-      const newNode = {
-        id: uuidv4(),
-        type: itemType,
-        x,
-        y,
-        name: `q${this.stateCounter++}`,
-        isInitial: false,
-      };
-      this.nodes.push(newNode);
-
-      // Record the add node action
-      this.actionHistory.push({
-        type: 'add_node',
-        node: newNode,
-      });
-      break;
-
-    case 'Edge':
-      if (this.nodes.length >= 2) {
-        const fromNode = this.nodes[this.nodes.length - 2];
-        const toNode = this.nodes[this.nodes.length - 1];
-        const label = prompt("Enter label for this edge (e.g., 'a' for q0 to q1 transition):", '') || '';
-
-        const newEdge = {
-          id: uuidv4(),
-          fromNodeId: fromNode.id,
-          toNodeId: toNode.id,
-          x1: fromNode.x + 20,
-          y1: fromNode.y + 20,
-          x2: toNode.x + 20,
-          y2: toNode.y + 20,
-          label,
-        };
-        this.edges.push(newEdge);
-
-        // Record the add edge action
-        this.actionHistory.push({
-          type: 'add_edge',
-          edge: newEdge,
-        });
+      if (!this.hasInitialState && itemType !== 'InitialNode') {
+        alert('Please place an initial state first.');
+        return;
       }
-      break;
 
-    case 'SelfLoop':
-      const targetNode = this.nodes[this.nodes.length - 1];
-      if (targetNode) {
-        const label = prompt("Enter label for this self-loop (e.g., 'a'):", '') || '';
-        const newEdge = {
-          id: uuidv4(),
-          fromNodeId: targetNode.id,
-          toNodeId: targetNode.id,
-          x1: targetNode.x,
-          y1: targetNode.y,
-          x2: targetNode.x,
-          y2: targetNode.y,
-          label,
-          isSelfLoop: true,
-        };
-        this.edges.push(newEdge);
+      switch (itemType) {
+        case 'InitialNode':
+          if (!this.hasInitialState) {
+            const newNode = {
+              id: uuidv4(),
+              type: 'Node',
+              x,
+              y,
+              name: `q${this.stateCounter++}`,
+              isInitial: true,
+            };
+            this.nodes.push(newNode);
+            this.hasInitialState = true;
 
-        // Record the add edge action
-        this.actionHistory.push({
-          type: 'add_edge',
-          edge: newEdge,
-        });
+            // Record the add node action
+            this.actionHistory.push({
+              type: 'add_node',
+              node: newNode,
+            });
+          }
+          break;
+
+        case 'Node':
+          const newNode = {
+            id: uuidv4(),
+            type: itemType,
+            x,
+            y,
+            name: `q${this.stateCounter++}`,
+            isInitial: false,
+          };
+          this.nodes.push(newNode);
+
+          // Record the add node action
+          this.actionHistory.push({
+            type: 'add_node',
+            node: newNode,
+          });
+          break;
+
+        case 'Edge':
+          if (this.nodes.length >= 2) {
+            const fromNode = this.nodes[this.nodes.length - 2];
+            const toNode = this.nodes[this.nodes.length - 1];
+            const label = prompt("Enter label for this edge (e.g., 'a' for q0 to q1 transition):", '') || '';
+
+            const newEdge = {
+              id: uuidv4(),
+              fromNodeId: fromNode.id,
+              toNodeId: toNode.id,
+              x1: fromNode.x + 20,
+              y1: fromNode.y + 20,
+              x2: toNode.x + 20,
+              y2: toNode.y + 20,
+              label,
+            };
+            this.edges.push(newEdge);
+
+            // Record the add edge action
+            this.actionHistory.push({
+              type: 'add_edge',
+              edge: newEdge,
+            });
+          }
+          break;
+
+        case 'SelfLoop':
+          const targetNode = this.nodes[this.nodes.length - 1];
+          if (targetNode) {
+            const label = prompt("Enter label for this self-loop (e.g., 'a'):", '') || '';
+            const newEdge = {
+              id: uuidv4(),
+              fromNodeId: targetNode.id,
+              toNodeId: targetNode.id,
+              x1: targetNode.x,
+              y1: targetNode.y,
+              x2: targetNode.x,
+              y2: targetNode.y,
+              label,
+              isSelfLoop: true,
+            };
+            this.edges.push(newEdge);
+
+            // Record the add edge action
+            this.actionHistory.push({
+              type: 'add_edge',
+              edge: newEdge,
+            });
+          }
+          break;
+
+        default:
+          break;
       }
-      break;
-
-    default:
-      break;
-  }
-},
+    },
 
     updateEdges() {
       this.edges.forEach((edge) => {
