@@ -1,26 +1,10 @@
 <template>
   <div class="container">
     <div class="left-side">
-      <div class="workspace-header">
-  <h2 class="workspace-title">Workspace</h2>
-  <p>Drop items here</p>
-
-  <!-- File Operations Group -->
-  <div class="button-group file-operations">
-    <button @click="openSaveModal">Save Graph</button>
-    <button @click="saveAsImage">Save as Image</button>
-    <button @click="loadGraph">Manage Graphs</button>
-    <button @click="saveGraphsAsJSON">Export Graph</button>
-    <button @click="importJSON">Import Graph</button>
-    <button @click="clearWorkspace">Clear Workspace</button>
-  </div>
-
-  <!-- Edit Operations Group -->
-  <div class="button-group edit-operations">
-    <button @click="undoLastAction" :disabled="actionHistory.length === 0">Undo</button>
-    <button @click="redoLastAction" :disabled="redoStack.length === 0">Redo</button>
-  </div>
-</div>
+      <WorkspaceHeader :actionHistoryLength="actionHistory.length" :redoStackLength="redoStack.length"
+        @openSaveModal="openSaveModal" @saveAsImage="saveAsImage" @loadGraph="loadGraph"
+        @saveGraphsAsJSON="saveGraphsAsJSON" @importJSON="importJSON" @clearWorkspace="clearWorkspace"
+        @undoLastAction="undoLastAction" @redoLastAction="redoLastAction" />
 
       <div class="workspace" ref="workspace" @dragover.prevent="onDragOver" @drop="onDrop">
         <svg class="edges-layer" style="position: absolute; width: 100%; height: 100%; top: 0; left: 0;">
@@ -65,7 +49,6 @@
                 <input type="radio" :value="String(graph.graphid)" v-model="selectedGraphId" />
                 {{ graph.name }} - {{ graph.description }}
               </label>
-              <!-- Image Preview -->
               <div v-if="selectedGraphId === String(graph.graphid)">
                 <img :src="graph.image" alt="Graph Preview" class="graph-preview-image" />
               </div>
@@ -77,7 +60,6 @@
           <button @click="showGraphModal = false">Cancel</button>
         </div>
       </div>
-
 
       <div v-if="showSaveModal" class="modal-overlay" @click="closeSaveModal">
         <div class="modal-content" @click.stop>
@@ -96,45 +78,16 @@
           </form>
         </div>
       </div>
-
     </div>
-
-    <div class="toolbox">
-      <h2>Toolbox</h2>
-      <p>Drag items from here:</p>
-
-      <div class="toolbox-item" draggable="true" @dragstart="onDragStart($event, 'SelfLoop')">
-        <svg width="60" height="60">
-          <path d="M 20,40 C 10,20, 50,20, 40,40" stroke="#333" stroke-width="2" fill="none" />
-          <polygon points="37,36 45,40 37,44" fill="#333" />
-        </svg>
-      </div>
-
-      <div class="toolbox-item" draggable="true" @dragstart="onDragStart($event, 'Node')">
-        <div class="node-circle"></div>
-      </div>
-
-      <div class="toolbox-item" draggable="true" @dragstart="onDragStart($event, 'InitialNode')">
-        <div class="double-circle"></div>
-      </div>
-
-      <div class="toolbox-item" draggable="true" @dragstart="onDragStart($event, 'Edge')">
-        <svg width="60" height="10">
-          <defs>
-            <marker id="toolbox-arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-              <polygon points="0 0, 10 3.5, 0 7" fill="#333" />
-            </marker>
-          </defs>
-          <line x1="0" y1="5" x2="50" y2="5" stroke="#333" stroke-width="2" marker-end="url(#toolbox-arrowhead)" />
-        </svg>
-      </div>
-    </div>
+    <Toolbox @dragStart="onDragStart" />
   </div>
 </template>
 
 <script lang="ts">
 import html2canvas from 'html2canvas';
 import { v4 as uuidv4 } from 'uuid';
+import WorkspaceHeader from '@/components/WorkspaceHeader.vue';
+import Toolbox from '@/components/Toolbox.vue';
 
 interface Node {
   id: string;
@@ -174,6 +127,10 @@ export default {
       actionHistory: [] as any[],
       redoStack: [] as any[],
     };
+  },
+  components: {
+    WorkspaceHeader,
+    Toolbox,
   },
   methods: {
     clearWorkspace() {
@@ -239,7 +196,6 @@ export default {
         return;
       }
 
-      // Move the redone action back to the action history
       this.actionHistory.push(lastUndone);
 
       switch (lastUndone.type) {
@@ -264,8 +220,6 @@ export default {
           break;
       }
     },
-
-
 
     async deleteSelectedGraph() {
       if (!this.selectedGraphId) {
@@ -298,20 +252,17 @@ export default {
         if (result.isSuccess) {
           alert('Graph deleted successfully!');
 
-          // Remove the deleted graph from the savedGraphs array
           this.savedGraphs = this.savedGraphs.filter(graph => String(graph.graphid) !== this.selectedGraphId);
           this.selectedGraphId = null;
 
         } else {
           alert('Failed to delete the graph.');
         }
-
       } catch (error) {
         console.error('Error deleting graph:', error);
         alert('An error occurred while deleting the graph.');
       }
     },
-
     async importJSON() {
       try {
         const token = localStorage.getItem('token');
@@ -320,7 +271,6 @@ export default {
           alert('No user information found. Please log in again.');
           return;
         }
-
         const fileInput = document.createElement('input');
         fileInput.type = 'file';
         fileInput.accept = '.json';
@@ -338,20 +288,14 @@ export default {
               alert('The selected file contains invalid JSON.');
               return;
             }
-
-            // Check if jsonData is an array
             if (Array.isArray(jsonData)) {
               if (jsonData.length === 0) {
                 alert('The JSON array is empty.');
                 return;
               }
-
-              // For simplicity, take the first graph in the array
               jsonData = jsonData[0];
-              // Alternatively, you can implement logic to select which graph to import
             }
 
-            // Validate JSON Structure
             if (!jsonData.nodes || !Array.isArray(jsonData.nodes)) {
               alert('Invalid JSON structure: "nodes" array is missing.');
               return;
@@ -361,13 +305,9 @@ export default {
               alert('Invalid JSON structure: "edges" array is missing.');
               return;
             }
-
-            // Map and Assign Nodes
             this.nodes = jsonData.nodes.map((nodeData: any) => {
-              // Assign a unique ID if missing
               const nodeId = nodeData.nodeid || uuidv4();
 
-              // Ensure required properties are present
               return {
                 id: nodeId,
                 type: nodeData.type || 'Node',
@@ -378,15 +318,10 @@ export default {
               };
             });
 
-            // Check for initial state
             this.hasInitialState = this.nodes.some(node => node.isInitial);
-
-            // Map and Assign Edges
             this.edges = jsonData.edges.map((edgeData: any) => {
-              // Assign a unique ID if missing
               const edgeId = uuidv4();
 
-              // Determine if it's a self-loop
               const isSelfLoop = edgeData.isSelfLoop !== undefined
                 ? edgeData.isSelfLoop
                 : edgeData.from_nodeid === edgeData.to_nodeid;
@@ -395,7 +330,7 @@ export default {
                 id: edgeId,
                 fromNodeId: edgeData.fromNodeid,
                 toNodeId: edgeData.to_nodeid,
-                x1: 0, // Will be set in updateEdges
+                x1: 0,
                 y1: 0,
                 x2: 0,
                 y2: 0,
@@ -403,14 +338,8 @@ export default {
                 isSelfLoop: isSelfLoop,
               };
             });
-
-            // Update Edge Positions
             this.updateEdges();
-
-            // Optional: Reset selectedGraphId if necessary
             this.selectedGraphId = null;
-
-            // Notify the user
             alert('Graph imported successfully!');
           }
         };
@@ -499,7 +428,6 @@ export default {
       }
     },
 
-
     loadSelectedGraph() {
       const graph = this.savedGraphs.find((g) => String(g.graphid) === this.selectedGraphId);
       if (graph) {
@@ -549,13 +477,11 @@ export default {
       const workspace = this.$refs.workspace as HTMLElement;
       if (!workspace) return;
 
-      // Prompt the user for a filename
       const filename = prompt("Enter a filename for your image:", "workspace.png");
-      if (!filename) return; // Exit if the user cancels or doesn't enter a filename
+      if (!filename) return; 
 
       html2canvas(workspace).then((canvas) => {
         const link = document.createElement('a');
-        // Ensure the filename ends with .png
         link.download = filename.toLowerCase().endsWith('.png') ? filename : `${filename}.png`;
         link.href = canvas.toDataURL('image/png');
         link.click();
@@ -583,7 +509,6 @@ export default {
           return;
         }
 
-        // Capture the workspace image
         const workspace = this.$refs.workspace as HTMLElement;
         if (!workspace) {
           alert('Workspace not found.');
@@ -609,7 +534,7 @@ export default {
             label: edge.label || '',
             isSelfLoop: edge.isSelfLoop || false,
           })),
-          image: imageDataUrl, // Include the image data URL
+          image: imageDataUrl, 
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
           version: 1,
@@ -683,7 +608,6 @@ export default {
           this.nodes[index].y = y;
           this.updateEdges();
 
-          // Record the move action
           this.actionHistory.push({
             type: 'move_node',
             nodeIndex: index,
@@ -712,7 +636,6 @@ export default {
             this.nodes.push(newNode);
             this.hasInitialState = true;
 
-            // Record the add node action
             this.actionHistory.push({
               type: 'add_node',
               node: newNode,
@@ -731,7 +654,6 @@ export default {
           };
           this.nodes.push(newNode);
 
-          // Record the add node action
           this.actionHistory.push({
             type: 'add_node',
             node: newNode,
@@ -756,7 +678,6 @@ export default {
             };
             this.edges.push(newEdge);
 
-            // Record the add edge action
             this.actionHistory.push({
               type: 'add_edge',
               edge: newEdge,
@@ -781,7 +702,6 @@ export default {
             };
             this.edges.push(newEdge);
 
-            // Record the add edge action
             this.actionHistory.push({
               type: 'add_edge',
               edge: newEdge,
