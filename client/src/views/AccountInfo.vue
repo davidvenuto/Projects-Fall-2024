@@ -11,7 +11,6 @@
       <p><strong>Username:</strong> {{ user?.username }}</p>
       <p><strong>Email:</strong> {{ user?.email }}</p>
       
-      <button @click="handleLogout" class="logout-button">Logout</button>
     </div>
   </div>
 </template>
@@ -80,16 +79,6 @@ export default defineComponent({
       }
     };
     
-    const handleLogout = () => {
-      // Clear authentication data from localStorage
-      localStorage.removeItem('token');
-      localStorage.removeItem('username');
-      localStorage.removeItem('userid');
-      
-      // Redirect to login page
-      router.push({ name: 'Login' });
-    };
-    
     onMounted(() => {
       fetchUserInfo();
     });
@@ -97,8 +86,7 @@ export default defineComponent({
     return {
       user,
       loading,
-      error,
-      handleLogout
+      error
     };
   }
 });

@@ -64,7 +64,7 @@ export default defineComponent({
 
         localStorage.setItem('token', data.token);
         localStorage.setItem('username', data.user.username);
-        localStorage.setItem('userid', data.user.id);
+        localStorage.setItem('userid', data.user.userid);
 
         if (username) username.value = data.user.username;
 
