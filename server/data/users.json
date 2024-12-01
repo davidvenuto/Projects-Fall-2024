@@ -42,7 +42,7 @@
     },
     {
       "fullname": "New Account",
-      "email": "hello@gmail.com",
+      "email": "hello1@gmail.com",
       "username": "NewPerson",
       "password": "newpassword",
       "isAdmin": false,
@@ -59,7 +59,7 @@
     {
       "fullname": "James Whitmore",
       "email": "abc@gmail.com",
-      "username": "HellYeah",
+      "username": "James",
       "password": "lol",
       "isAdmin": false,
       "userid": 7
