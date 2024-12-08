@@ -87,6 +87,14 @@
       "password": "abc123",
       "isAdmin": false,
       "userid": 10
+    },
+    {
+      "fullname": "David",
+      "email": "venuto@newpaltz.edu",
+      "username": "davidvenuto1",
+      "password": "111111",
+      "isAdmin": false,
+      "userid": 11
     }
   ]
 }

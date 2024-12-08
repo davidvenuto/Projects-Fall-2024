@@ -122,7 +122,5 @@ export default defineComponent({
 });
 </script>
 
-
-  
   <style scoped src="./css/graph-modal.css"></style>
   
